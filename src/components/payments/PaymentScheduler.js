@@ -12,6 +12,9 @@ import ReactDOM from 'react-dom';
 // import ReactPDF from '@react-pdf/renderer';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
+import * as FileSaver from 'file-saver';
+import * as XLSX from 'xlsx';
+
 class PaymentScheduler extends React.Component {
     constructor() {
         super();
@@ -254,6 +257,41 @@ class PaymentScheduler extends React.Component {
             })
             ;
     }
+    exportToCSV = () => {
+        console.log("============================state", this.state);
+        const fileType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
+        const fileExtension = '.xlsx';
+        // const csvData = this.state.trimedData;
+        const csvData = this.state.user.totalEmi;
+        const fileName = this.state.user.id;
+        const formattedData = this.formatDataForExport(csvData);
+        console.log("------------------------formattedData", formattedData);
+        const ws = XLSX.utils.json_to_sheet(formattedData);
+        const wb = { Sheets: { 'data': ws }, SheetNames: ['data'] };
+        const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+        const data = new Blob([excelBuffer], {type: fileType});
+        FileSaver.saveAs(data, fileName + fileExtension);
+    }
+
+    formatDataForExport = (data) => {
+        let formattedData = [];
+        data!==undefined ? data.map((el, i)=> {
+            let obj = {
+                "Month": el.month!== undefined?el.month:"Nil",
+                "Principal": el.principal!== undefined?el.principal:"Nil",
+                "Interest": el.interest!== undefined?el.interest:"Nil",
+                "Total EMI": el.emi!== undefined?el.emi:"Nil",
+                "Amount Paid":el.paidEmi!== undefined?el.paidEmi:"Nil",
+                "Balance EMI":el.balEmi !== undefined?el.balEmi:"Nil",
+                "Outstanding Amount": el.outstandingBal?el.outstandingBal:0,
+                "Penalty":el.unpaidPen !== undefined?el.unpaidPen:"Nil"
+            }
+            console.log("-----------------OBJ", obj);
+            formattedData.push(obj);
+        }): formattedData = [];
+        return formattedData;
+    }
+
     async fetchData(e) {
 
         if (this.state.search !== '') {
@@ -521,6 +559,7 @@ class PaymentScheduler extends React.Component {
                                 Principal amount: £{this.state.user.expLoans.principle}, Tenure: {this.state.user.expLoans.tenure} months and interest:{this.state.user.expLoans.intrest}%
 
                                     <Button style={{ float: 'right', marginBottom: '10px', backgroundColor: 'green', borderColor: 'green' }} onClick={() => { this.printDocument() } }>Download </Button>
+                                    <Button style={{ float: 'right', marginBottom: '10px', backgroundColor: 'green', borderColor: 'green' }} onClick={() => { this.exportToCSV() } }>Download As excel </Button>
                             </p>
 
                         }
