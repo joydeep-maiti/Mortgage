@@ -261,14 +261,18 @@ class PaymentScheduler extends React.Component {
 
     exportPDF = () => {
         console.log("-------------------STATE", this.state);
+        const loan = this.state.user.expLoans;
+        const user = this.state.user.user;
         const unit = "pt";
         const size = "A4"; // Use A1, A2, A3 or A4
         const orientation = "portrait"; // portrait or landscape
     
         const marginLeft = 20;
+        const marginLeft2 = 350;
+        const basePosition = 130;
         const doc = new jsPDF(orientation, unit, size);
     
-        doc.setFontSize(12);
+        doc.setFontSize(20);
     
         const title = "Payement Scheduler";
         const headers = [["SNo", "Month","Principal","Interest","Total EMI","Amount Paid","Balance EMI","Outstanding Amount","Penalty"]];
@@ -286,7 +290,7 @@ class PaymentScheduler extends React.Component {
         ]);
     
         let content = {
-          startY: 50,
+          startY: basePosition+100,
           head: headers,
           body: data,
           theme: 'grid',
@@ -297,7 +301,20 @@ class PaymentScheduler extends React.Component {
           margin: marginLeft
         };
     
-        doc.text(title, marginLeft, 40);
+        doc.text(title, 200, 100);
+        // doc.text("User Name : "+user.fname + " "+ user.lname,marginLeft, 50);
+        doc.setFontSize(15);
+        doc.text("Loan Details",marginLeft, basePosition);
+        doc.text("Customer Details",marginLeft2, basePosition);
+        doc.setFontSize(12);
+        doc.text("Principle Amount : £"+loan.principle,marginLeft, basePosition+20);
+        doc.text("Tenure : "+loan.tenure+" Months",marginLeft, basePosition+35);
+        doc.text("Interest Rate : "+loan.intrest+"%",marginLeft, basePosition+50);
+        doc.text("Start Date : "+loan.startDate,marginLeft, basePosition+65);
+
+        doc.text("User Name : "+user.fname + " "+ user.lname,marginLeft2, basePosition+20);
+        doc.text("Mobile No. : "+user.mobileNo,marginLeft2, basePosition+35);
+
         doc.autoTable(content);
         // doc.autoTable({ html: '#emiTable' })
         doc.save(this.state.user.id+".pdf")
@@ -350,7 +367,7 @@ class PaymentScheduler extends React.Component {
                 localStorage.setItem('reqId', id)
                 const res = await axios.get(`${Data.url}/users/${id}`)
                     .then(res => {
-                        debugger
+                        // debugger
                         console.log(res.data, "data")
                         this.setState({
                             user: res.data
@@ -606,7 +623,7 @@ class PaymentScheduler extends React.Component {
                             <p>
                                 Principal amount: £{this.state.user.expLoans.principle}, Tenure: {this.state.user.expLoans.tenure} months and interest:{this.state.user.expLoans.intrest}%
 
-                                    <Button style={{ float: 'right', marginBottom: '10px', backgroundColor: 'green', borderColor: 'green' }} onClick={() => { this.printDocument() } }>Download </Button>
+                                    {/* <Button style={{ float: 'right', marginBottom: '10px', backgroundColor: 'green', borderColor: 'green' }} onClick={() => { this.printDocument() } }>Download </Button> */}
                                     <Button style={{ float: 'right', marginBottom: '10px', backgroundColor: 'green', borderColor: 'green' }} onClick={() => { this.exportToCSV() } }>Download As excel </Button>
                                     <Button style={{ float: 'right', marginBottom: '10px', backgroundColor: 'green', borderColor: 'green' }} onClick={() => { this.exportPDF() } }>Download As PDF </Button>
                             </p>
