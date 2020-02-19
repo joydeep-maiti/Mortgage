@@ -12,6 +12,7 @@ import ReactDOM from 'react-dom';
 // import ReactPDF from '@react-pdf/renderer';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
+import "jspdf-autotable";
 import * as FileSaver from 'file-saver';
 import * as XLSX from 'xlsx';
 
@@ -257,6 +258,51 @@ class PaymentScheduler extends React.Component {
             })
             ;
     }
+
+    exportPDF = () => {
+        console.log("-------------------STATE", this.state);
+        const unit = "pt";
+        const size = "A4"; // Use A1, A2, A3 or A4
+        const orientation = "portrait"; // portrait or landscape
+    
+        const marginLeft = 20;
+        const doc = new jsPDF(orientation, unit, size);
+    
+        doc.setFontSize(12);
+    
+        const title = "Payement Scheduler";
+        const headers = [["SNo", "Month","Principal","Interest","Total EMI","Amount Paid","Balance EMI","Outstanding Amount","Penalty"]];
+    
+        const data = this.state.user.totalEmi.map((el,i)=> [
+            i+1,
+            el.month!== undefined?el.month:"Nil", 
+            el.principal!== undefined?el.principal:"Nil",
+            el.interest!== undefined?el.interest:"Nil",
+            el.emi!== undefined?el.emi:"Nil",
+            el.paidEmi!== undefined?el.paidEmi:"Nil",
+            el.balEmi !== undefined?el.balEmi:"Nil",
+            el.outstandingBal?el.outstandingBal:0,
+            el.unpaidPen !== undefined?el.unpaidPen:"Nil"
+        ]);
+    
+        let content = {
+          startY: 50,
+          head: headers,
+          body: data,
+          theme: 'grid',
+          styles: {
+            cellWidth:'wrap',
+            halign: 'center',
+          },
+          margin: marginLeft
+        };
+    
+        doc.text(title, marginLeft, 40);
+        doc.autoTable(content);
+        // doc.autoTable({ html: '#emiTable' })
+        doc.save(this.state.user.id+".pdf")
+    }
+
     exportToCSV = () => {
         console.log("============================state", this.state);
         const fileType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
@@ -286,11 +332,13 @@ class PaymentScheduler extends React.Component {
                 "Outstanding Amount": el.outstandingBal?el.outstandingBal:0,
                 "Penalty":el.unpaidPen !== undefined?el.unpaidPen:"Nil"
             }
+            
             console.log("-----------------OBJ", obj);
             formattedData.push(obj);
         }): formattedData = [];
         return formattedData;
     }
+
 
     async fetchData(e) {
 
@@ -560,13 +608,14 @@ class PaymentScheduler extends React.Component {
 
                                     <Button style={{ float: 'right', marginBottom: '10px', backgroundColor: 'green', borderColor: 'green' }} onClick={() => { this.printDocument() } }>Download </Button>
                                     <Button style={{ float: 'right', marginBottom: '10px', backgroundColor: 'green', borderColor: 'green' }} onClick={() => { this.exportToCSV() } }>Download As excel </Button>
+                                    <Button style={{ float: 'right', marginBottom: '10px', backgroundColor: 'green', borderColor: 'green' }} onClick={() => { this.exportPDF() } }>Download As PDF </Button>
                             </p>
 
                         }
 
                     </div>
 
-                    <Table >
+                    <Table id="emiTable">
                         <Table.Header>
                             <Table.Row>
                                 <Table.HeaderCell>SNo</Table.HeaderCell>
