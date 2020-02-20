@@ -16,6 +16,9 @@ import "jspdf-autotable";
 import * as FileSaver from 'file-saver';
 import * as XLSX from 'xlsx';
 
+let totalEmiPaid = 0;
+
+
 class PaymentScheduler extends React.Component {
     constructor() {
         super();
@@ -259,10 +262,12 @@ class PaymentScheduler extends React.Component {
             ;
     }
 
-    exportPDF = () => {
+    exportPDF = (condition) => {
         console.log("-------------------STATE", this.state);
         const loan = this.state.user.expLoans;
         const user = this.state.user.user;
+        const reqId = this.state.user.id;
+
         const unit = "pt";
         const size = "A4"; // Use A1, A2, A3 or A4
         const orientation = "portrait"; // portrait or landscape
@@ -274,21 +279,22 @@ class PaymentScheduler extends React.Component {
     
         doc.setFontSize(20);
     
-        const title = "Payement Scheduler";
-        const headers = [["SNo", "Month","Principal","Interest","Total EMI","Amount Paid","Balance EMI","Outstanding Amount","Penalty"]];
-    
-        const data = this.state.user.totalEmi.map((el,i)=> [
-            i+1,
-            el.month!== undefined?el.month:"Nil", 
-            el.principal!== undefined?el.principal:"Nil",
-            el.interest!== undefined?el.interest:"Nil",
-            el.emi!== undefined?el.emi:"Nil",
-            el.paidEmi!== undefined?el.paidEmi:"Nil",
-            el.balEmi !== undefined?el.balEmi:"Nil",
-            el.outstandingBal?el.outstandingBal:0,
-            el.unpaidPen !== undefined?el.unpaidPen:"Nil"
-        ]);
-    
+        let title = "Payement Scheduler";
+        let headers = [["SNo", "Month","Principal","Interest","Total EMI","Amount Paid","Balance EMI","Outstanding Amount","Penalty"]];
+        let data = []
+        const self = this;
+        switch(condition){
+            case "ALL": title = "Payment Scheduler";
+                        data = self.getAllEmiData();
+                        break;
+            case "PAID": title = "EMI Paid Report";
+                        data = self.getPaidEmiData();
+                        break;
+            case "UNPAId": title = "EMI Due Report";
+                        data = self.getUnpaidEmiData();
+                        break;
+        }
+        console.log("---------------DATA",data)
         let content = {
           startY: basePosition+100,
           head: headers,
@@ -304,13 +310,15 @@ class PaymentScheduler extends React.Component {
         doc.text(title, 200, 100);
         // doc.text("User Name : "+user.fname + " "+ user.lname,marginLeft, 50);
         doc.setFontSize(15);
+        
         doc.text("Loan Details",marginLeft, basePosition);
         doc.text("Customer Details",marginLeft2, basePosition);
         doc.setFontSize(12);
-        doc.text("Principle Amount : £"+loan.principle,marginLeft, basePosition+20);
-        doc.text("Tenure : "+loan.tenure+" Months",marginLeft, basePosition+35);
-        doc.text("Interest Rate : "+loan.intrest+"%",marginLeft, basePosition+50);
-        doc.text("Start Date : "+loan.startDate,marginLeft, basePosition+65);
+        doc.text("Req No.: "+reqId,marginLeft, basePosition+20);
+        doc.text("Principle Amount : £"+loan.principle,marginLeft, basePosition+35);
+        doc.text("Tenure : "+loan.tenure+" Months",marginLeft, basePosition+50);
+        doc.text("Current Interest Rate : "+loan.intrest+"%",marginLeft, basePosition+65);
+        doc.text("Start Date : "+loan.startDate,marginLeft, basePosition+80);
 
         doc.text("User Name : "+user.fname + " "+ user.lname,marginLeft2, basePosition+20);
         doc.text("Mobile No. : "+user.mobileNo,marginLeft2, basePosition+35);
@@ -320,12 +328,125 @@ class PaymentScheduler extends React.Component {
         doc.save(this.state.user.id+".pdf")
     }
 
+    getAllEmiData = () => {
+        totalEmiPaid = 0;
+        console.log("============= in get all emi",)
+        let data = this.state.user.emiScheduler.map((el,i)=> {
+            totalEmiPaid += el.paidEmi!== undefined?parseInt(el.paidEmi):parseInt(0);
+            return [
+                i+1,
+                el.month!== undefined?el.month:"Nil", 
+                el.principal!== undefined?el.principal:"Nil",
+                el.interest!== undefined?el.interest:"Nil",
+                el.emi!== undefined?el.emi:"Nil",
+                el.paidEmi!== undefined?el.paidEmi:"Nil",
+                el.balEmi !== undefined?el.balEmi:"Nil",
+                el.outstandingBal?el.outstandingBal:0,
+                el.unpaidPen !== undefined?el.unpaidPen:"Nil"
+            ]
+        });
+        data.push([
+            "",
+            "Total",
+            "",
+            "",
+            "",
+            totalEmiPaid,
+            "",
+            "",
+            ""
+        ])
+
+        return data;
+    }
+
+    getPaidEmiData = () => {
+        totalEmiPaid = 0;
+        
+        console.log("============= in get paid emi",)
+        let data = [];
+        this.state.user.emiScheduler.map((el,i)=> {
+            totalEmiPaid += el.paidEmi!== undefined?parseInt(el.paidEmi):parseInt(0);
+            if(el.paidEmi !== undefined){
+                data.push([
+                    i+1,
+                    el.month!== undefined?el.month:"Nil", 
+                    el.principal!== undefined?el.principal:"Nil",
+                    el.interest!== undefined?el.interest:"Nil",
+                    el.emi!== undefined?el.emi:"Nil",
+                    el.paidEmi!== undefined?el.paidEmi:"Nil",
+                    el.balEmi !== undefined?el.balEmi:"Nil",
+                    el.outstandingBal?el.outstandingBal:0,
+                    el.unpaidPen !== undefined?el.unpaidPen:"Nil"
+                ])
+            }
+        });
+        data.push([
+            "",
+            "Total",
+            "",
+            "",
+            "",
+            totalEmiPaid,
+            "",
+            "",
+            ""
+        ])
+
+        return data;
+    }
+
+    getUnpaidEmiData = () => {
+        console.log("============= in get paid emi",)
+        let data = [];
+        let count = 1;
+        totalEmiPaid = 0;
+        let totalDue =0 ;
+        let flag = 0;
+        this.state.user.emiScheduler.map((el,i)=> {
+            totalEmiPaid += el.paidEmi!== undefined?parseInt(el.paidEmi):parseInt(0);
+            if(el.paidEmi == undefined){
+                if(flag == 0){
+                    totalDue = el.outstandingBal
+                    flag =1;
+                }
+                data.push([
+                    count,
+                    el.month!== undefined?el.month:"Nil", 
+                    el.principal!== undefined?el.principal:"Nil",
+                    el.interest!== undefined?el.interest:"Nil",
+                    el.emi!== undefined?el.emi:"Nil",
+                    el.paidEmi!== undefined?el.paidEmi:"Nil",
+                    el.balEmi !== undefined?el.balEmi:"Nil",
+                    el.outstandingBal?el.outstandingBal:0,
+                    el.unpaidPen !== undefined?el.unpaidPen:"Nil"
+                ])
+                count++;
+
+            }
+            
+        });
+        data.push([
+            "",
+            "Total Due",
+            "",
+            "",
+            "",
+            "",
+            "",
+            totalDue,
+            ""
+        ])
+
+        return data;
+    }
+
     exportToCSV = () => {
         console.log("============================state", this.state);
         const fileType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
         const fileExtension = '.xlsx';
         // const csvData = this.state.trimedData;
-        const csvData = this.state.user.totalEmi;
+        const csvData = this.state.user.emiScheduler;
         const fileName = this.state.user.id;
         const formattedData = this.formatDataForExport(csvData);
         console.log("------------------------formattedData", formattedData);
@@ -339,6 +460,7 @@ class PaymentScheduler extends React.Component {
     formatDataForExport = (data) => {
         let formattedData = [];
         data!==undefined ? data.map((el, i)=> {
+            totalEmiPaid += el.paidEmi!== undefined?parseInt(el.paidEmi):parseInt(0);
             let obj = {
                 "Month": el.month!== undefined?el.month:"Nil",
                 "Principal": el.principal!== undefined?el.principal:"Nil",
@@ -353,6 +475,10 @@ class PaymentScheduler extends React.Component {
             console.log("-----------------OBJ", obj);
             formattedData.push(obj);
         }): formattedData = [];
+        formattedData.push({
+            "Month": "Total",
+            "Amount Paid": totalEmiPaid
+        })
         return formattedData;
     }
 
@@ -618,18 +744,25 @@ class PaymentScheduler extends React.Component {
                 <Paper style={{ marginRight: '0px', padding: '15px', width: '97%', height: "fit-content", marginBottom: '10px', marginLeft: '18px', marginTop: '25px' }}>
                     <div className="align">
                         <h3>Payement Scheduler</h3>
+                            <p>Request No : {this.state.user.user?this.state.user.id:""}</p>
                         {
                             this.state.user.expLoans &&
+                            <div>
                             <p>
                                 Principal amount: £{this.state.user.expLoans.principle}, Tenure: {this.state.user.expLoans.tenure} months and interest:{this.state.user.expLoans.intrest}%
 
                                     {/* <Button style={{ float: 'right', marginBottom: '10px', backgroundColor: 'green', borderColor: 'green' }} onClick={() => { this.printDocument() } }>Download </Button> */}
-                                    <Button style={{ float: 'right', marginBottom: '10px', backgroundColor: 'green', borderColor: 'green' }} onClick={() => { this.exportToCSV() } }>Download As excel </Button>
-                                    <Button style={{ float: 'right', marginBottom: '10px', backgroundColor: 'green', borderColor: 'green' }} onClick={() => { this.exportPDF() } }>Download As PDF </Button>
+                                    <Button style={{ float: 'right', marginBottom: '10px',color:"white", backgroundColor: 'green', borderColor: 'green' }} onClick={() => { this.exportToCSV() } }>Download As excel </Button>
+                                    <Button style={{ float: 'right', marginBottom: '10px',color:"white", backgroundColor: 'green', borderColor: 'green' }} onClick={() => { this.exportPDF("ALL") } }>Download As PDF </Button>
                             </p>
+                            <p style={{ marginTop : "28px"}}>
+                                <Button style={{ float: 'right', marginBottom: '10px', color:"white", backgroundColor: 'green', borderColor: 'green' }} onClick={() => { this.exportPDF("UNPAId") } }>Download Unpaid Emi report </Button>
+                                <Button style={{ float: 'right', marginBottom: '10px', color:"white", backgroundColor: 'green', borderColor: 'green' }} onClick={() => { this.exportPDF("PAID") } }>Download Paid Emi report </Button>
+                            </p>
+                            </div>
 
                         }
-
+                        
                     </div>
 
                     <Table id="emiTable">

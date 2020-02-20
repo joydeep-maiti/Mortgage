@@ -8,7 +8,8 @@
 // }
 
 const dev = {
-    url: "https://json-server-mortgage.herokuapp.com"
+    // url: "https://json-server-mortgage.herokuapp.com"
+    url : "http://localhost:4000"
 
 };
 
