@@ -12,3 +12,24 @@
 .landing-app{
     margin-top: 50px;
 }
+.ui.modal>.close {
+    top: 1.0535rem;
+    right: 1rem;
+    color: rgba(0,0,0,.87);
+}
+
+.reportCol {
+    width: 300px;
+    display: flex;
+    margin-top: 10px;
+    margin-left: auto;
+    margin-right: auto;
+}
+/* .reportModal {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+} */
