@@ -40,13 +40,28 @@ class Mortgage extends React.Component {
             totalUser: 0,
             errorMsg: '',
             errorBorder: '',
-            update: true
+            update: true,
+            propertyRate:null
 
 
         }
 
     }
 
+    componentWillMount = () => {
+        axios.get(`${Data.url}/property/1`)
+        .then(res => {
+            console.log("submitInterestConfig data", res);
+            this.setState({
+                propertyRate: res.data
+            })
+
+        })
+        .catch(e => {
+            // throw new Error(e.response.data);
+            window.alert("data not getting")
+        });
+    }
 
     handleProperty = (e, { value }) => {
         debugger
@@ -390,16 +405,16 @@ class Mortgage extends React.Component {
 
         switch (value.toUpperCase()) {
             case ('CAR'):
-                interestRate = 11;
+                interestRate = this.state.propertyRate.car;
                 break;
             case ('GOLD'):
-                interestRate = 8;
+                interestRate = this.state.propertyRate.gold;
                 break;
             case ('PROPERTY AGAINST'):
-                interestRate = 8.5;
+                interestRate = this.state.propertyRate.propertyAgainst;
                 break;
             case ('OTHERS'):
-                interestRate = 10;
+                interestRate = this.state.propertyRate.other;
                 break;
                 defalult:
                 interestRate = 10;
