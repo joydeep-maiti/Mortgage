@@ -25,6 +25,12 @@
     margin-left: auto;
     margin-right: auto;
 }
+.navbar-dark .navbar-nav .nav-link {
+    color: rgba(255,255,255);
+    font-family:'Arial';
+    font-style:'Bolder';
+
+}
 /* .reportModal {
     position: absolute;
     width: 100%;

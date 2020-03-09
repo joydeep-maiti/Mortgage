@@ -24,7 +24,7 @@ export default class MyNavbar extends React.Component {
                 endDate : "",
                 type: 3,
             },
-            user: null
+            showDateField: false
         }
     }
 
@@ -334,8 +334,8 @@ export default class MyNavbar extends React.Component {
                 </Navbar>
                 {this.props.children}
                 {/* <div class="reportModal"> */}
-                    <Modal open={this.state.showModal} style={{height: 400,minHeight: '380px',width:'70%', height: '50%',
-    marginLeft: '15%', marginTop:'5%'}} closeIcon onClose={this.onCloseClick}>
+                    <Modal open={this.state.showModal} style={{height:"auto",minHeight:300,width:'40%',
+    marginLeft: '30%', marginTop:'10%',borderradius:'15px',}} closeIcon onClose={this.onCloseClick}>
                         <Modal.Header style={{textAlign: 'center'}}>Generate Report</Modal.Header>
                         <Modal.Content>
                             <Modal.Description>
@@ -343,11 +343,11 @@ export default class MyNavbar extends React.Component {
                             <Row >
                             <Col className="same-row">
                                 <div className="reportCol">
-                                    <div className="name-wd" >
-                                        Request No. <sup style={{ color: 'red' }}>*</sup>:
+                                    <div className="name-wd" style={{textAlign:"right", marginRight:10}} >
+                                        Request No. <sup style={{ color: 'red' }}>*</sup>&nbsp;&nbsp;:
                                     </div >
-                                    <div className="ui input">
-                                        <input type="text" name="reqno" placeholder="Request No." required onChange={(e,data) => this.handleOnChange(e,data,"req" )} value={this.state.reportReq.reqId}/>
+                                    <div className="ui input" style={{width:"196px"}}>
+                                        <input type="text" name="reqno" placeholder="Request No." required onChange={(e,data) => this.handleOnChange(e,data,"req" )} value={this.state.reportReq.reqId} required/>
                                         {/* <input type="text"
                                         style={{ borderColor: this.state.errorBorder ? this.state.errorBorder : '' }}
                                         name="fname" onChange={(e) => this.handleOnChange(e)}
@@ -360,40 +360,41 @@ export default class MyNavbar extends React.Component {
                         <Row >
                             <Col className="same-row">
                                 <div className="reportCol">
-                                    <div className="name-wd">
-                                        Start date<sup style={{ color: 'red' }}>*</sup>:
-                                    </div >
+                                    <div className="name-wd" style={{textAlign:"right", marginRight:10}}>
+                                    Type<sup style={{ color: 'red' }}>*</sup>:
+                                    </div>
                                     <div className="ui input">
-                                        <input type="date" name="Date" placeholder="Start Date" onChange={(e,data) => this.handleOnChange(e,data,"startDate" )} value={this.state.reportReq.startDate}/>
+                                        <Dropdown placeholder='Report Type' search selection options={stateOptions} onChange={(e,data) => this.handleOnChange(e,data,"type")} defaultValue={this.state.reportReq.type} required/>
+                                    </div>
+                                </div>
+                            </Col>
+                        </Row>
+                        <Row style={this.state.reportReq.type === 1?{display:"block"}:{display:"none"}}>
+                            <Col className="same-row" >
+                                <div className="reportCol">
+                                    <div className="name-wd" style={{textAlign:"right", marginRight:10}}>
+                                        Start date<sup style={{ color: 'red' }}>*</sup>&nbsp;&nbsp;:
+                                    </div >
+                                    <div className="ui input" style={{width:"196px"}}>
+                                        <input type="date" name="Date" placeholder="Start Date" onChange={(e,data) => this.handleOnChange(e,data,"startDate" )} value={this.state.reportReq.startDate} required/>
                                     </div>
                                 </div>
                                 
                             </Col>
                         </Row>
-                        <Row >
+                        <Row style={this.state.reportReq.type === 1?{display:"block"}:{display:"none"}}>
                             <Col className="same-row">
                                 <div className="reportCol">
-                                    <div className="name-wd">
-                                        End date<sup style={{ color: 'red' }}>*</sup>:
+                                    <div className="name-wd" style={{textAlign:"right", marginRight:10}}>
+                                        End date<sup style={{ color: 'red' }}>*</sup>&nbsp;&nbsp;:
                                     </div >
-                                    <div className="ui input">
-                                        <input type="date" name="Date" placeholder="End Date" onChange={(e,data) => this.handleOnChange(e,data,"endDate" )} value={this.state.reportReq.endDate}/>
+                                    <div className="ui input" style={{width:"196px"}}>
+                                        <input type="date" name="Date" placeholder="End Date" onChange={(e,data) => this.handleOnChange(e,data,"endDate" )} value={this.state.reportReq.endDate} required/>
                                     </div>
                                 </div>
                             </Col>
                         </Row>
-                        <Row >
-                            <Col className="same-row">
-                                <div className="reportCol">
-                                    <div className="name-wd">
-                                    Type<sup style={{ color: 'red' }}>*</sup>:
-                                    </div>
-                                    <div className="ui input">
-                                        <Dropdown placeholder='Report Type' search selection options={stateOptions} onChange={(e,data) => this.handleOnChange(e,data,"type")} defaultValue={this.state.reportReq.type} />
-                                    </div>
-                                </div>
-                            </Col>
-                        </Row>
+                        
                         {/* <Row >
                             <Col className="same-row">
                                 <div className="name-space">
