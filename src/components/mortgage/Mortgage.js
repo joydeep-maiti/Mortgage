@@ -51,7 +51,7 @@ class Mortgage extends React.Component {
     componentWillMount = () => {
         axios.get(`${Data.url}/property/1`)
         .then(res => {
-            console.log("submitInterestConfig data", res);
+            console.log("gettingInterestConfig data", res);
             this.setState({
                 propertyRate: res.data
             })
@@ -63,8 +63,17 @@ class Mortgage extends React.Component {
         });
     }
 
+    handleKeyPress = (event) => {
+        console.log("---------------In Key press", event)
+        if (event.key == 'Enter') {
+            event.preventDefault();
+            console.log("----------")
+            this.fetchKey();
+        }
+    }
+
     handleProperty = (e, { value }) => {
-        debugger
+        // debugger
         console.log(value);
         let propertyType = { ...this.state.property, propertyType: value }
         console.log(propertyType)
@@ -199,7 +208,7 @@ class Mortgage extends React.Component {
         }
     }
     async download(reqId, fileName) {
-        debugger
+        // debugger
         const res = await fetch(`${Data.url}/download?reqid=${reqId}&fileName=${fileName}`);
         const blob = await res.blob();
         download(blob, fileName);
@@ -217,7 +226,7 @@ class Mortgage extends React.Component {
 
     }
     handleOnChange(e) {
-        debugger
+        // debugger
         let user = this.state.user;
         user[e.target.name] = e.target.value
         this.setState({
@@ -241,7 +250,7 @@ class Mortgage extends React.Component {
 
     }
     async deleteFile(index, itemAttributes) {
-        debugger
+        // debugger
         this.setState({
             totalProperty: [
                 ...this.state.totalProperty.slice(0, index),
@@ -253,16 +262,15 @@ class Mortgage extends React.Component {
 
         let p = this.state.totalProperty;
     }
-    async fetchKey() {
-        debugger
+    fetchKey = ()=> {
         if (this.state.search !== '') {
 
             if (this.state.user !== undefined) {
                 let id = `Req${('000000' + this.state.search).slice(-5)}`;
                 localStorage.setItem('req', id)
-                const res = await axios.get(`${Data.url}/users/${id}`)
+                axios.get(`${Data.url}/users/${id}`)
                     .then(res => {
-                        console.log(res.data, "data");
+                        console.log("Application res data",res.data );
                         let address = res.data.user.Address;
                         localStorage.setItem("ReqId", res.data.id);
                         //let resfile1 = new File(res.data.totalProperty[0].file1)
@@ -294,9 +302,8 @@ class Mortgage extends React.Component {
                     }).catch(e => {
                         window.alert("Invalid request number")
                         //this.search.value = "";
-                        throw new Error(e.response.data);
+                        // throw new Error(e.response.data);
                     });
-                return res;
             }
         }
     }
@@ -304,7 +311,7 @@ class Mortgage extends React.Component {
 
     async handleProceed(reqID) {
 
-        debugger;
+        // debugger;
         const { financial, user, expLoan, totalProperty, annualIncome, radio, status } = this.state;
         if ((expLoan.principle !== undefined && expLoan.principle !== '') && (expLoan.tenure !== undefined && expLoan.tenure !== '')
             && (expLoan.propertyType !== undefined && expLoan.propertyType !== '') && (expLoan.startDate !== undefined && expLoan.startDate !== '')) {
@@ -313,9 +320,66 @@ class Mortgage extends React.Component {
             let expLoans = { ...expLoan, radio }
             let res;
 
-
+            let cal = expLoan.principle;
+            console.log(cal, "----------------------")
+            let tenure = Number(expLoan.tenure);
+            console.log(tenure, "----------------------")
+            let interest = Number(expLoan.intrest);
+            console.log(typeof interest, "----------------------")
+            let intr = Number(interest / (12 * 100))
+            let r = 1 + intr;
+            let e = Math.pow(r, tenure)
+            let finalEmi = e / (e - 1)
+            let emi = Math.round(cal * intr * finalEmi)
+            let emiScheduler = [];
+            let date = expLoan.startDate.split('-');
+            let day = Number(date[2]);
+            let j = 0;
+            let outstandingBal = 0;
+            let yr = Number(date[0]);
+            let mon = 0;
+            if (cal) {
+                for (var i = 0; i < tenure; i++) {
+                    let row = {
+                        month: '',
+                        interest: '',
+                        principal: '',
+                        outstandingBal: '',
+                        emi: ''
+                    }
+                    if (i === 0) {
+                        mon = Number(date[1]);
+                        outstandingBal = cal
+                        console.log(outstandingBal, "iiiiii")
+                    }
+                    else {
+                        mon = mon + 1;
+                    }
+                    row.month = day + '-' + mon + '-' + yr;
+                    row.emi = emi;
+                    let a = (intr * outstandingBal);
+                    let b = emi - a;
+                    row.interest = Math.round(a);
+                    row.principal = Math.round(b);
+                    outstandingBal = outstandingBal - (emi - Math.floor(a));
+                    outstandingBal = Math.round(outstandingBal);
+                    console.log(outstandingBal, "before 0")
+                    outstandingBal = (outstandingBal < 0) ? 0 : outstandingBal;
+                    row.outstandingBal = outstandingBal;
+                    // console.log('int:' + Math.round(a), 'prin:' + b, 'outstanding bal: ' + outstandingBal, 'emi : ', a + b, "-----")
+                    console.log('EMI :', emi, 'INT:', Math.round(a), 'Prin:', (emi - a), (emi - Math.floor(a)), 'Balance:', outstandingBal);
+                    if (mon >= 12) {
+                        mon = 0;
+                        yr = yr + 1
+                    }
+                    emiScheduler.push(row);
+                    j++;
+                }
+            }
+            const emivalue = [...emiScheduler]
+            console.log('-------Calculated EMIs:', emivalue);
             if (reqID && reqID != undefined) {
-                let body = { user, annualIncome, financial, expLoans, totalProperty, status }
+                let body = { user, annualIncome, financial, expLoans, totalProperty, status, totalEmi:emivalue }
                 res = await axios.put(`${Data.url}/users/${reqID}`, body, )
                     .then(res => {
                         console.log(res.data, "data")
@@ -336,7 +400,7 @@ class Mortgage extends React.Component {
                 let tot = this.state.totalUser + 1
                 let id = `Req${('000000' + tot).slice(-5)}`
                 let storedID = localStorage.setItem("ReqId", id);
-                let body = { user, annualIncome, financial, expLoans, totalProperty, id, status }
+                let body = { user, annualIncome, financial, expLoans, totalProperty, id, status,totalEmi:emivalue }
                 res = await axios.post(`${Data.url}/users/`, body, )
                     .then(res => {
                         console.log(res.data, "data")
@@ -399,9 +463,9 @@ class Mortgage extends React.Component {
 
     }
     propertySelect = (e, { value }) => {
-        debugger
+        // debugger
         let interestRate;
-        debugger;
+        // debugger;
 
         switch (value.toUpperCase()) {
             case ('CAR'):
@@ -450,7 +514,7 @@ class Mortgage extends React.Component {
         let id;
         let availableProperty;
         let newTotalProperty
-        debugger;
+        // debugger;
         let data = new FormData();
         this.setState({
             tab: true, open: false,
@@ -1149,9 +1213,11 @@ class Mortgage extends React.Component {
                         Welcome to the Mortgages
                 </h2>
                     <Form inline style={{ marginLeft: '200px' }} >
-                        <FormControl type="text" placeholder="Request Number...." className="mr-sm-2"
+                            <FormControl type="text" placeholder="Request Number...." className="mr-sm-2" ref={el => this.search = el}
+                            onChange={(e) => this.searchKey(e)} value={this.state.search} style={{ marginLeft: '187px', paddingRight: '35px' }} onKeyPress={this.handleKeyPress} />
+                        {/* <FormControl type="text" placeholder="Request Number...." className="mr-sm-2"
                             ref={el => this.search = el}
-                            onChange={(e) => this.searchKey(e)} defaultValue={this.state.search} style={{ marginLeft: '90px', paddingRight: '35px' }} />
+                            onChange={(e) => this.searchKey(e)} defaultValue={this.state.search} style={{ marginLeft: '90px', paddingRight: '35px' }} onKeyPress={(e)=>this.handleKeyPress(e)}/> */}
                         <Icon size="large" inverted name='search' className="searchIcon" color='black' link onClick={() => this.fetchKey()} />
                     </Form>
                 </div>

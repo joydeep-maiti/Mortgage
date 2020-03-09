@@ -94,7 +94,7 @@ class PaymentScheduler extends React.Component {
 
     }
     handleKeyPress = (event) => {
-        console.log("hello", event)
+        // console.log("hello", event)
         // console.log("hello")
         if (event.key == 'Enter') {
             console.log("----------")
@@ -483,7 +483,7 @@ class PaymentScheduler extends React.Component {
     }
 
 
-    async fetchData(e) {
+    fetchData = (e)=> {
 
         if (this.state.search !== '') {
 
@@ -491,15 +491,15 @@ class PaymentScheduler extends React.Component {
                 console.log("inside fetch method")
                 let id = `Req${('000000' + this.state.search).slice(-5)}`;
                 localStorage.setItem('reqId', id)
-                const res = await axios.get(`${Data.url}/users/${id}`)
+                axios.get(`${Data.url}/users/${id}`)
                     .then(res => {
                         // debugger
                         console.log(res.data, "data")
-                        this.setState({
-                            user: res.data
-                        }, () => {
-                            console.log(res.data, "all dattaaaaa")
-                        })
+                        // this.setState({
+                        //     user: res.data
+                        // }, () => {
+                        //     console.log(res.data, "all dattaaaaa")
+                        // })
                         let cal = (res.data.expLoans.principle);
                         console.log(cal, "----------------------")
                         let tenure = Number(res.data.expLoans.tenure);
@@ -511,14 +511,14 @@ class PaymentScheduler extends React.Component {
                         let e = Math.pow(r, tenure)
                         let finalEmi = e / (e - 1)
                         let emi = Math.round(cal * intr * finalEmi)
-                        this.setState({
-                            emi: emi,
-                            tenure: tenure,
-                            interest: intr
+                        // this.setState({
+                        //     emi: emi,
+                        //     tenure: tenure,
+                        //     interest: intr
 
-                        })
+                        // })
                         let emiScheduler = [];
-                        let date = this.state.user.expLoans.startDate.split('-');
+                        let date = res.data.expLoans.startDate.split('-');
                         let day = Number(date[2]);
                         let j = 0;
                         let outstandingBal = 0;
@@ -563,33 +563,41 @@ class PaymentScheduler extends React.Component {
                             }
                         }
                         const emivalue = [...emiScheduler]
-                        this.setState({
-                            user: { ...this.state.user, totalEmi: emivalue, },
-                        })
+                        
                         this.search.value = "";
                         let active = {
                             activePage: this.state.activePage
                         }
-                        this.handlePaginationChange(null, active)
+                        this.setState({
+                            user: { ...res.data, totalEmi: emivalue, },
+                            emi: emi,
+                            tenure: tenure,
+                            interest: intr,
+                        },
+                            ()=>this.handlePaginationChange(null, active)
+                        )
+                        
                     })
                     .catch(e => {
                         window.alert("Invalid request number")
-                        this.search.value = "";
+                        // this.search.value = "";
                         // throw new Error(e.response.data);
                     });
 
-                return res;
+                // return res;
             }
             else {
-                this.setState({
-                    user: this.state.user
-                })
+                // this.setState({
+                //     user: this.state.user
+                // })
+                alert("Undefined");
             }
         }
         else {
             window.alert("Please Enter Request ID")
         }
     }
+
     componentDidMount() {
         let d = new Date();
         let month = ("00" + (d.getMonth() + 1)).slice(-2)
@@ -605,38 +613,6 @@ class PaymentScheduler extends React.Component {
 
 
     render() {
-        // const styles = StyleSheet.create({
-        //     page: {
-        //         flexDirection: 'row',
-        //         backgroundColor: '#E4E4E4'
-        //     },
-        //     section: {
-        //         margin: 10,
-        //         padding: 10,
-        //         flexGrow: 1
-        //     }
-        // });
-
-        // // Create Document Component
-        // const MyDocument = () => (
-        //     <Document>
-        //         <Page size="A4" style={styles.page}>
-        //             <View style={styles.section}>
-        //                 <Text>Section #1</Text>
-        //             </View>
-        //             <View style={styles.section}>
-        //                 <Text>Section #2</Text>
-        //             </View>
-        //         </Page>
-        //     </Document>
-        // );
-        // const App = () => (
-        //     <PDFViewer>
-        //         <MyDocument />
-        //     </PDFViewer>
-        // );
-
-
         const { open, activePage } = this.state;
         console.log("index value", this.state.indexValue)
         const payment = [
