@@ -1137,7 +1137,7 @@ class Mortgage extends React.Component {
 
                             return < Table.Row key={i} >
                                 <Table.Cell>{property.propertyType}</Table.Cell>
-                                <Table.Cell> £ {property.assestValue}</Table.Cell>
+                                <Table.Cell> {property.assestValue}</Table.Cell>
                                 <Table.Cell>
                                     <div >MorgagedDoc : <a href="javascript:;" onClick={() => this.download(this.state.reqId, (property.file1 ? property.file1.name : ''))}>{property.file1 ? property.file1.name : ' '} </a>
                                         {property.file1 && <Icon size="small" inverted name='delete' className="searchIcon" color='black' link onClick={() => this.deleteFile(i, { file1: undefined })} />}</div>
@@ -1269,7 +1269,7 @@ class Mortgage extends React.Component {
                                             <div className="ui input"><input type="text"
                                                 style={{ borderColor: this.state.errorBorder ? this.state.errorBorder : '' }}
                                                 name="faName" onChange={(e) => this.handleOnChange(e)}
-                                                defaultValue={this.state.user.faname && this.state.user.faname}
+                                                defaultValue={this.state.user.faName && this.state.user.faName}
                                                 placeholder="Father Name" required /></div>
                                         </div>
 
@@ -1370,7 +1370,7 @@ class Mortgage extends React.Component {
                                                 Company:
                                             </div >
                                             <div className="ui input" ><input type="text"
-                                                name="company:" onChange={(e) => this.handleOnChange(e)} placeholder=" company"
+                                                name="company" onChange={(e) => this.handleOnChange(e)} placeholder=" company"
                                                 defaultValue={this.state.user.company}
                                                 required
                                                 />

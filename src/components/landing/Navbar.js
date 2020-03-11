@@ -8,6 +8,7 @@ import './style.css'
 import { Data } from '../../config'
 import jsPDF from 'jspdf';
 import "jspdf-autotable";
+import Logo from '../../logo.png'
 
 let totalEmiPaid = 0;
 
@@ -67,7 +68,7 @@ export default class MyNavbar extends React.Component {
 
     onSubmitClick = () => {
         const reportInput = this.state.reportReq
-        if(reportInput.startDate=="" || reportInput.startDate==null ||reportInput.endDate=="" || reportInput.endDate==null || reportInput.reqId=="" || reportInput.reqId==null ||reportInput.type=="" || reportInput.type==null){
+        if((reportInput.startDate=="" && reportInput.type===1) || (reportInput.startDate==null && reportInput.type===1) ||(reportInput.endDate=="" && reportInput.type===1) || (reportInput.endDate==null && reportInput.type===1) || reportInput.reqId=="" || reportInput.reqId==null ||reportInput.type=="" || reportInput.type==null){
             alert("All Fields are required");
         }else {
             this.fetchReportData(reportInput.reqId);
@@ -152,7 +153,7 @@ export default class MyNavbar extends React.Component {
         doc.text("Customer Details",marginLeft2, basePosition);
         doc.setFontSize(12);
         doc.text("Req No.: "+reqId,marginLeft, basePosition+20);
-        doc.text("Principle Amount : £"+loan.principle,marginLeft, basePosition+35);
+        doc.text("Principle Amount : "+loan.principle,marginLeft, basePosition+35);
         doc.text("Tenure : "+loan.tenure+" Months",marginLeft, basePosition+50);
         doc.text("Current Interest Rate : "+loan.intrest+"%",marginLeft, basePosition+65);
         doc.text("Start Date : "+loan.startDate,marginLeft, basePosition+80);
@@ -168,7 +169,7 @@ export default class MyNavbar extends React.Component {
     getAllEmiData = () => {
         totalEmiPaid = 0;
         console.log("============= in get all emi",)
-        let data = this.state.user.emiScheduler.map((el,i)=> {
+        let data = this.state.user.totalEmi.map((el,i)=> {
             totalEmiPaid += el.paidEmi!== undefined?parseInt(el.paidEmi):parseInt(0);
             return [
                 i+1,
@@ -202,7 +203,7 @@ export default class MyNavbar extends React.Component {
         
         console.log("============= in get paid emi",)
         let data = [];
-        this.state.user.emiScheduler.map((el,i)=> {
+        this.state.user.totalEmi.map((el,i)=> {
             totalEmiPaid += el.paidEmi!== undefined?parseInt(el.paidEmi):parseInt(0);
             if(el.paidEmi !== undefined){
                 data.push([
@@ -240,7 +241,7 @@ export default class MyNavbar extends React.Component {
         totalEmiPaid = 0;
         let totalDue =0 ;
         let flag = 0;
-        this.state.user.emiScheduler.map((el,i)=> {
+        this.state.user.totalEmi.map((el,i)=> {
             totalEmiPaid += el.paidEmi!== undefined?parseInt(el.paidEmi):parseInt(0);
             if(el.paidEmi == undefined){
                 if(flag == 0){
@@ -288,11 +289,16 @@ export default class MyNavbar extends React.Component {
         return (
             <div>
                 <Navbar bg="primary" variant="dark" expand="lg">
-                    <Navbar.Brand href="/">Mortgage Loan</Navbar.Brand>
+                    <Navbar.Brand href="/">
+                        <img src={Logo} width="50px" height="auto" style={{borderRadius:"11px"}}/>
+                    </Navbar.Brand>
                     <Navbar.Toggle aria-controls="basic-navbar-nav" />
                     <Nav variant="pills" defaultActiveKey="/">
                         <Nav.Item>
-                            <Nav.Link href="/paymentLoan">Payment Loan</Nav.Link>
+                            <Nav.Link href="/mortgage">Apply Loan</Nav.Link>
+                        </Nav.Item>
+                        <Nav.Item>
+                            <Nav.Link href="/paymentLoan">Loan Applications</Nav.Link>
                         </Nav.Item>
                         <Nav.Item>
                             <Nav.Link eventKey="link-1" href='/paymentScheduler'>Payment Scheduler</Nav.Link>
