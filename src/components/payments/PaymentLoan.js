@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import axios from 'axios'
 import { Icon, Dropdown, Table, Modal } from 'semantic-ui-react'
+import {Form, FormControl} from 'react-bootstrap'
 import { Data } from '../../config'
 import download from 'downloadjs';
 class PaymentLoan extends React.Component {
@@ -9,30 +10,77 @@ class PaymentLoan extends React.Component {
     this.state = {
       status: '',
       user: [],
+      filteredApplication :[],
       open: false,
       currentData: []
     }
   }
 
-  componentDidMount() {
-    debugger
+  componentWillMount() {
+    // debugger
     // console.log(this.state.reqId, "khjkhj.kdjhskdhcskhcskdhjkk")
-    const res = axios.get(`${Data.url}/users/`, )
+    axios.get(`${Data.url}/users/`, )
       .then(res => {
-        console.log(res.data, "datakdhjskdjhsdjkhsdhjk")
-        this.setState({
-          user: res.data
-        }, () => console.log(this.state.user, "-------------------"))
-
-
-
+        console.log("------------------Applications",res.data)
+        if(res.status === 200){
+          this.setState({
+            user: res.data,
+            filteredApplication: res.data
+          })
+        }
       })
       .catch(e => {
         throw new Error(e.response.data);
       });
-
-    return res;
   }
+
+  searchKey = (e) => {
+    console.log("hello", e.target.value)
+    let val = e.target.value
+    if(val == ""){
+      this.setState({
+        search: val,
+        filteredApplication : this.state.user
+    })
+    }
+    this.setState({
+        search: val
+    },
+    ()=>this.fetchKey()
+    )
+
+  }
+
+  handleKeyPress = (event) => {
+    console.log("---------------In Key press", event)
+    if (event.key == 'Enter') {
+        event.preventDefault();
+        console.log("----------")
+        this.fetchKey();
+    }
+  }
+
+  fetchKey = ()=> {
+    console.log("------STATE", this.state)
+    if (this.state.search !== '') {
+
+        if (this.state.user !== undefined) {
+            let id = `Req${('000000' + this.state.search).slice(-5)}`;
+            let filteredApplication = []
+            this.state.user.map((el, i)=> {
+              console.log("-------App",el,el.id)
+              if(el.id === id){
+                filteredApplication.push(el);
+              }
+            })
+            console.log("------filteredApplication",filteredApplication)
+            this.setState({
+              filteredApplication
+            })
+        }
+    }
+  }
+
   async componentWillReceiveProps(userUpdate) {
     let id = userUpdate.id
     let body = userUpdate;
@@ -57,7 +105,7 @@ class PaymentLoan extends React.Component {
   }
   close = () => this.setState({ open: false })
   handleStatus = (value, i, user) => {
-    debugger
+    // debugger
     console.log(value, i, user)
     let userUpdate = { ...this.state.user[i], status: value }
     console.log(userUpdate, "uhiuhh")
@@ -128,10 +176,16 @@ class PaymentLoan extends React.Component {
     )
     return (
       <div className="head-m" style={{ backgroundColor: '#f5f6fa', paddingBottom: '45px', marginTop: '0px' }}>
-        <h2 style={{textAlign:"center", padding:"20px"}}>Loan Applications</h2>
-
-
-
+        {/* <div style={{textAlign:"center"}}> */}
+          <h2 style={{textAlign:"center", padding:"20px"}}>Loan Applications</h2>
+          <Form inline  style={{ float: 'right', marginRight:"20px", marginBottom:"20px"}}>
+                Search:
+                  <FormControl type="text" placeholder="Request Number...." className="mr-sm-2" ref={el => this.search = el} style={{ marginLeft: '20px'}}
+                  onChange={(e) => this.searchKey(e)} value={this.state.search} onKeyPress={this.handleKeyPress} />
+              {/* <Icon size="large" inverted name='search' className="searchIcon" color='black' link onClick={() => this.fetchKey()} /> */}
+          </Form>
+        {/* </div> */}
+        <br/>
         <Table striped >
           <Table.Header>
             <Table.Row >
@@ -149,7 +203,7 @@ class PaymentLoan extends React.Component {
           </Table.Header>
 
           <Table.Body >
-            {this.state.user && this.state.user.map((user, i) => {
+            {this.state.filteredApplication && this.state.filteredApplication.map((user, i) => {
               return <Table.Row key={i} >
                 <Table.Cell>{i + 1}</Table.Cell>
                 <Table.Cell>{user.id}</Table.Cell>

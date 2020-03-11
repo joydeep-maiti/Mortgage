@@ -1019,7 +1019,7 @@ class Mortgage extends React.Component {
                         <div className="name-space">
                             <div className="name-wd" >
                                 MortgageDoc:
-                            </div >
+                            </div>
                             <div className="ui input"><input type="file" name="morgageDoc" style={{ border: '0px' }}
                                 onChange={(e) => this.handleUpload(e)}
                                 /></div>
@@ -1215,9 +1215,7 @@ class Mortgage extends React.Component {
                     <Form inline style={{ marginLeft: '200px' }} >
                             <FormControl type="text" placeholder="Request Number...." className="mr-sm-2" ref={el => this.search = el}
                             onChange={(e) => this.searchKey(e)} value={this.state.search} style={{ marginLeft: '187px', paddingRight: '35px' }} onKeyPress={this.handleKeyPress} />
-                        {/* <FormControl type="text" placeholder="Request Number...." className="mr-sm-2"
-                            ref={el => this.search = el}
-                            onChange={(e) => this.searchKey(e)} defaultValue={this.state.search} style={{ marginLeft: '90px', paddingRight: '35px' }} onKeyPress={(e)=>this.handleKeyPress(e)}/> */}
+                       
                         <Icon size="large" inverted name='search' className="searchIcon" color='black' link onClick={() => this.fetchKey()} />
                     </Form>
                 </div>
