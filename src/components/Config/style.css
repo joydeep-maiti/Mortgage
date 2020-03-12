@@ -1,0 +1,11 @@
+.configInput {
+    width : 100%;
+    display: flex;
+    margin-top: 10px;
+    margin-left: 40px;
+}
+
+.configLevel {
+    width: 169px;
+    margin-top: 10px;
+}
