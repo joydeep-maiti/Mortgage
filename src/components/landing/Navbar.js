@@ -133,6 +133,7 @@ export default class MyNavbar extends React.Component {
                         break;
         }
         console.log("---------------DATA",data)
+        // return;
         let content = {
           startY: basePosition+100,
           head: headers,
@@ -169,7 +170,8 @@ export default class MyNavbar extends React.Component {
     getAllEmiData = () => {
         totalEmiPaid = 0;
         console.log("============= in get all emi",)
-        let data = this.state.user.totalEmi.map((el,i)=> {
+        let emidatas = this.state.user.emiScheduler ? this.state.user.emiScheduler : this.state.user.totalEmi
+        let data = emidatas.map((el,i)=> {
             totalEmiPaid += el.paidEmi!== undefined?parseInt(el.paidEmi):parseInt(0);
             return [
                 i+1,
@@ -202,23 +204,47 @@ export default class MyNavbar extends React.Component {
         totalEmiPaid = 0;
         
         console.log("============= in get paid emi",)
+        if( !this.state.user.emiScheduler ){
+            alert("No Paid Emis found");
+            return
+        }
+        let emidatas = this.state.user.emiScheduler 
         let data = [];
-        this.state.user.totalEmi.map((el,i)=> {
+
+        let startdate = this.state.reportReq.startDate
+        let enddate = this.state.reportReq.endDate
+        
+        emidatas.map((el,i)=> {
             totalEmiPaid += el.paidEmi!== undefined?parseInt(el.paidEmi):parseInt(0);
             if(el.paidEmi !== undefined){
-                data.push([
-                    i+1,
-                    el.month!== undefined?el.month:"Nil", 
-                    el.principal!== undefined?el.principal:"Nil",
-                    el.interest!== undefined?el.interest:"Nil",
-                    el.emi!== undefined?el.emi:"Nil",
-                    el.paidEmi!== undefined?el.paidEmi:"Nil",
-                    el.balEmi !== undefined?el.balEmi:"Nil",
-                    el.outstandingBal?el.outstandingBal:0,
-                    el.unpaidPen !== undefined?el.unpaidPen:"Nil"
-                ])
+                let date = el.month.split("-");
+                let day = date[0];
+                let mon = date[1];
+                let yr = date[2];
+                date = yr + '-' + mon + '-' + day;
+
+                if( date >= startdate && date <= enddate){
+                    console.log("-----------Start lesser than Emi",date, startdate, enddate)
+                    data.push([
+                        i+1,
+                        el.month!== undefined?el.month:"Nil", 
+                        el.principal!== undefined?el.principal:"Nil",
+                        el.interest!== undefined?el.interest:"Nil",
+                        el.emi!== undefined?el.emi:"Nil",
+                        el.paidEmi!== undefined?el.paidEmi:"Nil",
+                        el.balEmi !== undefined?el.balEmi:"Nil",
+                        el.outstandingBal?el.outstandingBal:0,
+                        el.unpaidPen !== undefined?el.unpaidPen:"Nil"
+                    ])
+                }
+                
+                
             }
         });
+        if(data.length === 0){
+            alert("No Paid Emi data found for the time period")
+            return
+        }
         data.push([
             "",
             "Total",
@@ -241,7 +267,8 @@ export default class MyNavbar extends React.Component {
         totalEmiPaid = 0;
         let totalDue =0 ;
         let flag = 0;
-        this.state.user.totalEmi.map((el,i)=> {
+        let emidatas = this.state.user.emiScheduler ? this.state.user.emiScheduler : this.state.user.totalEmi
+        emidatas.map((el,i)=> {
             totalEmiPaid += el.paidEmi!== undefined?parseInt(el.paidEmi):parseInt(0);
             if(el.paidEmi == undefined){
                 if(flag == 0){

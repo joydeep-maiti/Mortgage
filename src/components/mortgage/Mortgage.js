@@ -333,10 +333,10 @@ class Mortgage extends React.Component {
             let emi = Math.round(cal * intr * finalEmi)
             let emiScheduler = [];
             let date = expLoan.startDate.split('-');
-            let day = Number(date[2]);
+            let day = date[2];
             let j = 0;
             let outstandingBal = 0;
-            let yr = Number(date[0]);
+            let yr = date[0];
             let mon = 0;
             if (cal) {
                 for (var i = 0; i < tenure; i++) {
@@ -348,7 +348,7 @@ class Mortgage extends React.Component {
                         emi: ''
                     }
                     if (i === 0) {
-                        mon = Number(date[1]);
+                        mon = date[1];
                         outstandingBal = cal
                         console.log(outstandingBal, "iiiiii")
                     }
