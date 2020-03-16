@@ -15,7 +15,7 @@ import './style.css'
 import { Data } from '../../config'
 import jsPDF from 'jspdf';
 import "jspdf-autotable";
-import Logo from '../../logo.png'
+import Logo from '../../logo.jpg'
 
 let totalEmiPaid = 0;
 
@@ -25,7 +25,7 @@ export default class MyNavbar extends React.Component {
         this.state = {
             search: '',
             showModal: false,
-            user: {},
+            user: [],
             reportReq: {
                 reqId: "",
                 startDate : "",
@@ -102,7 +102,7 @@ export default class MyNavbar extends React.Component {
     fetchReportData = (reqId) => {
         console.log('===============reqId', reqId);
         let url = null
-        if( reqId == undefined){
+        if( reqId == undefined ){
             url = `${Data.url}/users`
         }else {
             let reqid = `Req${('000000' + reqId).slice(-5)}`;
@@ -110,17 +110,28 @@ export default class MyNavbar extends React.Component {
             url = `${Data.url}/users/${reqid}`;
         }
         console.log('----------URL', url);
-        return;
+        // return;
         const self = this;
         axios.get(url)
         .then(res => {
             console.log("fetchReportData", res);
             if(res.status === 200){
-                this.setState({
-                    user: res.data
-                },
-                ()=>self.exportPDF()
-                )
+                if( reqId == undefined ){
+                    this.setState({
+                        applications: res.data
+                    },
+                        ()=>self.exportPDF('ALL')
+                    )
+                }else {
+                    let response = []
+                    response.push(res.data);
+                    this.setState({
+                        user: response
+                    },
+                        ()=>self.exportPDF('APP')
+                    )
+                }
+                
             }
             
 
@@ -131,13 +142,17 @@ export default class MyNavbar extends React.Component {
         });
     }
 
-    exportPDF = () => {
+    exportPDF = (el) => {
         console.log("-------------------STATE", this.state);
+        if(el === 'ALL'){
+
+        }else if(el === 'APP'){
+
+        }
+        // return;
         let type = this.state.reportReq.type
         let condition = type === 1 ? "PAID":type === 2 ? "UNPAId":"ALL"
-        const loan = this.state.user.expLoans;
-        const user = this.state.user.user;
-        const reqId = this.state.user.id;
+        
 
         const unit = "pt";
         const size = "A4"; // Use A1, A2, A3 or A4
@@ -148,89 +163,140 @@ export default class MyNavbar extends React.Component {
         const basePosition = 130;
         const doc = new jsPDF(orientation, unit, size);
     
-        doc.setFontSize(20);
+        
     
         let title = "Payement Scheduler";
         let headers = [["SNo", "Month","Principal","Interest","Total EMI","Amount Paid","Balance EMI","Outstanding Amount","Penalty"]];
-        let data = []
+        let applicationsEmiJsonArray = []
         const self = this;
         switch(condition){
             case "ALL": title = "Payment Scheduler";
-                        data = self.getAllEmiData();
+            applicationsEmiJsonArray = self.getAllEmiData();
                         break;
             case "PAID": title = "EMI Paid Report";
-                        data = self.getPaidEmiData();
+            applicationsEmiJsonArray = self.getPaidEmiData();
                         break;
             case "UNPAId": title = "EMI Due Report";
-                        data = self.getUnpaidEmiData();
+            applicationsEmiJsonArray = self.getUnpaidEmiData();
                         break;
         }
-        console.log("---------------DATA",data)
+        // console.log("---------------applicationsEmiJsonArray",applicationsEmiJsonArray)
         // return;
-        let content = {
-          startY: basePosition+100,
-          head: headers,
-          body: data,
-          theme: 'grid',
-          styles: {
-            cellWidth:'wrap',
-            halign: 'center',
-          },
-          margin: marginLeft
-        };
+        let flag = 0;
+        let pageCount = 0;
+        // let footer = function (data) {
+        //     doc.setFontSize(10);
+        //     doc.setFontStyle('normal');
+        //     let pageCount = pageCount + data.pageCount
+        //     var str ="Page " + pageCount;
+        //     doc.text(str, data.settings.margin.left, doc.internal.pageSize.height - 30);
+        //     // var today = new moment().format("YYYY-MM-DD");
+        //     // doc.text(today, right, doc.internal.pageSize.height - 30, 'right');
+        // };
+
+        for( let i=0 ; i<applicationsEmiJsonArray.length ; i++ ){
+
+            let loan = applicationsEmiJsonArray[i].expLoans;
+            let user = applicationsEmiJsonArray[i].user;
+            let reqId = applicationsEmiJsonArray[i].id;
+            let content = {
+                startY: basePosition+100,
+                head: headers,
+                body: applicationsEmiJsonArray[i].emiTableData,
+                theme: 'grid',
+                styles: {
+                cellWidth:'wrap',
+                halign: 'center',
+                },
+                margin: marginLeft
+            };
+            
+            if(flag == 1){
+                doc.addPage(orientation, unit, size )
+            }
+            if(flag == 0){
+                flag = 1;
+            }
+            doc.setFontSize(20);
+            doc.text(title, 200, 100);
+            doc.setFontSize(15);
+            
+            doc.text("Loan Details",marginLeft, basePosition);
+            doc.text("Customer Details",marginLeft2, basePosition);
+            doc.setFontSize(12);
+            doc.text("Req No.: "+reqId,marginLeft, basePosition+20);
+            doc.text("Principle Amount : "+loan.principle,marginLeft, basePosition+35);
+            doc.text("Tenure : "+loan.tenure+" Months",marginLeft, basePosition+50);
+            doc.text("Current Interest Rate : "+loan.intrest+"%",marginLeft, basePosition+65);
+            doc.text("Start Date : "+loan.startDate,marginLeft, basePosition+80);
     
-        doc.text(title, 200, 100);
-        // doc.text("User Name : "+user.fname + " "+ user.lname,marginLeft, 50);
-        doc.setFontSize(15);
-        
-        doc.text("Loan Details",marginLeft, basePosition);
-        doc.text("Customer Details",marginLeft2, basePosition);
-        doc.setFontSize(12);
-        doc.text("Req No.: "+reqId,marginLeft, basePosition+20);
-        doc.text("Principle Amount : "+loan.principle,marginLeft, basePosition+35);
-        doc.text("Tenure : "+loan.tenure+" Months",marginLeft, basePosition+50);
-        doc.text("Current Interest Rate : "+loan.intrest+"%",marginLeft, basePosition+65);
-        doc.text("Start Date : "+loan.startDate,marginLeft, basePosition+80);
-
-        doc.text("User Name : "+user.fname + " "+ user.lname,marginLeft2, basePosition+20);
-        doc.text("Mobile No. : "+user.mobileNo,marginLeft2, basePosition+35);
-
-        doc.autoTable(content);
+            doc.text("User Name : "+user.fname + " "+ user.lname,marginLeft2, basePosition+20);
+            doc.text("Mobile No. : "+user.mobileNo,marginLeft2, basePosition+35);
+    
+            doc.autoTable(content);
+            console.log("------------------page no", doc.internal.getNumberOfPages());
+            
+        }
+        console.log("------------------page no", doc.internal.getNumberOfPages())
         // doc.autoTable({ html: '#emiTable' })
         doc.save(this.state.user.id+".pdf")
     }
-
+    // , [], {
+    //     afterPageContent: footer,
+    //     headerStyles: {
+    //         fillColor: 255,
+    //         textColor: 0,
+    //         fontStyle: 'bold',
+    //         rowHeight: 20
+    //     }
+    // }
     getAllEmiData = () => {
-        totalEmiPaid = 0;
-        console.log("============= in get all emi",)
-        let emidatas = this.state.user.emiScheduler ? this.state.user.emiScheduler : this.state.user.totalEmi
-        let data = emidatas.map((el,i)=> {
-            totalEmiPaid += el.paidEmi!== undefined?parseInt(el.paidEmi):parseInt(0);
-            return [
-                i+1,
-                el.month!== undefined?el.month:"Nil", 
-                el.principal!== undefined?el.principal:"Nil",
-                el.interest!== undefined?el.interest:"Nil",
-                el.emi!== undefined?el.emi:"Nil",
-                el.paidEmi!== undefined?el.paidEmi:"Nil",
-                el.balEmi !== undefined?el.balEmi:"Nil",
-                el.outstandingBal?el.outstandingBal:0,
-                el.unpaidPen !== undefined?el.unpaidPen:"Nil"
-            ]
-        });
-        data.push([
-            "",
-            "Total",
-            "",
-            "",
-            "",
-            totalEmiPaid,
-            "",
-            "",
-            ""
-        ])
+        let applicationsEmiJsonArray = []
+        let applications = this.state.applications
+        for(let i = 0 ; i < applications.length ; i++){
+            totalEmiPaid = 0;
+            console.log("============= in get all emi",)
+            let emidatas = applications[i].emiScheduler ? applications[i].emiScheduler : applications[i].totalEmi
+            let data = emidatas.map((el,i)=> {
+                totalEmiPaid += el.paidEmi!== undefined?parseInt(el.paidEmi):parseInt(0);
+                return [
+                    i+1,
+                    el.month!== undefined?el.month:"Nil", 
+                    el.principal!== undefined?el.principal:"Nil",
+                    el.interest!== undefined?el.interest:"Nil",
+                    el.emi!== undefined?el.emi:"Nil",
+                    el.paidEmi!== undefined?el.paidEmi:"Nil",
+                    el.balEmi !== undefined?el.balEmi:"Nil",
+                    el.outstandingBal?el.outstandingBal:0,
+                    el.unpaidPen !== undefined?el.unpaidPen:"Nil"
+                ]
+            });
+            if(data.length>0){
+                data.push([
+                    "",
+                    "Total",
+                    "",
+                    "",
+                    "",
+                    totalEmiPaid,
+                    "",
+                    "",
+                    ""
+                ])
+                let applicationsEmiJson =  {
+                    user : applications[i].user,
+                    expLoans : applications[i].expLoans,
+                    id : applications[i].id,
+                    emiTableData : data
+                }
+    
+                applicationsEmiJsonArray.push(applicationsEmiJson);
+            }  
 
-        return data;
+        }
+        
+        // console.log("-------------applicationsEmiJsonArray", applicationsEmiJsonArray);
+        return applicationsEmiJsonArray;
     }
 
     getPaidEmiData = () => {

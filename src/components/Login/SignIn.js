@@ -12,7 +12,7 @@ import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
-
+import Logo from '../../logo.jpg'
 
 
 const useStyles = makeStyles(theme => ({
@@ -25,6 +25,8 @@ const useStyles = makeStyles(theme => ({
     avatar: {
         margin: theme.spacing(1),
         backgroundColor: theme.palette.secondary.main,
+        width: '90px',
+        height: 'auto'
     },
     form: {
         width: '100%', // Fix IE 11 issue.
@@ -66,7 +68,8 @@ export default function SignIn(props) {
         <CssBaseline />
         <div className={classes.paper}>
             <Avatar className={classes.avatar}>
-            <LockOutlinedIcon />
+            {/* <LockOutlinedIcon /> */}
+                <img src={Logo} width="90px" height="auto" />
             </Avatar>
             <Typography component="h1" variant="h5">
             Sign in
