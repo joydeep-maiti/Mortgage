@@ -3,6 +3,10 @@ import { Navbar, Form, Button, Nav, Row, Col, FormControl } from 'react-bootstra
 import { Header, Image, Modal } from 'semantic-ui-react'
 import { Button as MyBtn } from 'semantic-ui-react'
 import { Icon,Dropdown } from 'semantic-ui-react'
+import IconButton from '@material-ui/core/IconButton';
+import AccountCircle from '@material-ui/icons/AccountCircle';
+import MenuItem from '@material-ui/core/MenuItem';
+import Menu from '@material-ui/core/Menu';
 import axios from 'axios';
 import './style.css'
 import { Data } from '../../config'
@@ -25,7 +29,8 @@ export default class MyNavbar extends React.Component {
                 endDate : "",
                 type: 3,
             },
-            showDateField: false
+            showDateField: false,
+            anchorEl: null
         }
     }
 
@@ -305,7 +310,23 @@ export default class MyNavbar extends React.Component {
 
         return data;
     }
+    handleMenu = event => {
+        this.setAnchorEl(event.currentTarget);
+    };
+    
+    handleClose = () => {
+        this.setAnchorEl(null);
+    };
 
+    handleLogout = () => {
+        this.props.handleLogout();
+    };
+
+    setAnchorEl = (el)=> {
+        this.setState({
+            anchorEl: el
+        })
+    }
    
     render() {
         const stateOptions = [
@@ -313,6 +334,9 @@ export default class MyNavbar extends React.Component {
             { key: "2", text: "UnPaid Emi", value: 2},
             { key: "3", text: "All", value: 3},
         ]
+
+        const open = Boolean(this.state.anchorEl);
+        
         return (
             <div>
                 <Navbar bg="primary" variant="dark" expand="lg">
@@ -338,31 +362,39 @@ export default class MyNavbar extends React.Component {
                         </Nav.Item>
                     </Nav>
                     <Navbar.Collapse id="basic-navbar-nav" className="left-spacing"  >
-
-
-
-                        {/* <Form inline style={{ marginLeft: '200px' }} >
-                            <FormControl type="text" placeholder="Search" className="mr-sm-2"
-                                ref={el => this.search = el}
-                                onChange={(e) => this.searchKey(e)} defaultValue={this.state.search} />
-                            <Icon size="large" inverted name='search' className="searchIcon" color='white' link onClick={() => this.fetchKey()} />
-                        </Form> */}
                         <Nav className="ml-auto">
-
                             <Nav.Link href="#link">Services</Nav.Link>
                             <Nav.Link href="#link">Contact</Nav.Link>
-                            {/* <NavDropdown title="Dropdown" id="basic-nav-dropdown">
-                                <NavDropdown.Item href="#action/3.1">Action</NavDropdown.Item>
-                                <NavDropdown.Item href="#action/3.2">Another action</NavDropdown.Item>
-                                <NavDropdown.Item href="#action/3.3">Something</NavDropdown.Item>
-                                <NavDropdown.Divider />
-                                <NavDropdown.Item href="#action/3.4">Separated link</NavDropdown.Item>
-                            </NavDropdown> */}
                         </Nav>
-
-                        <Form inline className="loginBtn">
-                            <Button className="mr-sm-2" variant="outline-light" >LogIn </Button>
-                        </Form>
+                        <div>
+                            <IconButton
+                                aria-label="account of current user"
+                                aria-controls="menu-appbar"
+                                aria-haspopup="true"
+                                onClick={this.handleMenu}
+                                color="inherit"
+                            >
+                            <AccountCircle style={{ color: 'white' }}/>
+                            </IconButton>
+                            <Menu
+                                id="menu-appbar"
+                                anchorEl={this.state.anchorEl}
+                                anchorOrigin={{
+                                vertical: 'top',
+                                horizontal: 'right',
+                                }}
+                                keepMounted
+                                transformOrigin={{
+                                vertical: 'top',
+                                horizontal: 'right',
+                                }}
+                                open={open}
+                                onClose={this.handleClose}
+                            >
+                                <MenuItem onClick={this.handleClose}>Profile</MenuItem>
+                                <MenuItem onClick={this.handleLogout}>Logout</MenuItem>
+                            </Menu>
+                        </div>
                     </Navbar.Collapse>
                 </Navbar>
                 {this.props.children}

@@ -11,29 +11,84 @@ import PaymentLoan from './components/payments/PaymentLoan'
 import PaymentScheduler from './components/payments/PaymentScheduler'
 import { history } from "../src/components/helpers/history"
 import Config from './components/Config/Config'
+import SignIn from './components/Login/SignIn'
+
+class App extends React.Component {
+  state = {
+    auth : {
+      authentication : false,
+      username : null,
+      userrole : null
+    }
+  }
+
+  componentWillMount() {
+    let auth = localStorage.getItem("Auth");
+    if(auth){
+      this.setState({
+        auth : JSON.parse(auth)
+      })
+    }
+  }
+
+  handleSignin = (userName) => {
+    this.setState({
+      auth:{
+        authentication : true,
+        username: userName,
+        userrole :"ADMIN"
+      }
+    },
+    ()=> localStorage.setItem("Auth", JSON.stringify(this.state.auth))
+    )
+  }
+
+  handleLogout = () => {
+    this.setState({
+      auth:{
+        authentication : false,
+        username: null,
+        userrole : null
+      }
+    },
+    ()=>localStorage.removeItem("Auth")
+    )
+  }
 
 
-const App = () => {
-  return (
+  componentWillUnmount(){
+    // document.cookie = JSON.stringify(this.state.auth);
+  }
 
-    <Router history={history}>
-      <Fragment>
-        <Switch>
-          <Route exact path='/' render={() => <MyNavbar > <Landing /></MyNavbar>} />
-          <Route exact path='/mortgage' render={() => <MyNavbar > <Mortgage /></MyNavbar>} />
-          <Route exact path='/Preview' render={() => <MyNavbar > <Preview /></MyNavbar>} />
-          <Route exact path='/paymentLoan' render={() => <MyNavbar > <PaymentLoan /></MyNavbar>} />
-          <Route exact path='/paymentScheduler' render={() => <MyNavbar > <PaymentScheduler /></MyNavbar>} />
-          <Route exact path='/config' render={() => <MyNavbar > <Config /></MyNavbar>} />
-        </Switch>
-      </Fragment>
-    </Router>
+  render(){
+    let routes = null
+    if(!this.state.auth.authentication){
+      return(
+        <SignIn handleSignin={(userName)=>this.handleSignin(userName)}/>
+      )
+    }else {
+      routes = (
+          <div>
+            <Route exact path='/' render={() => <MyNavbar handleLogout={this.handleLogout}> <Landing /></MyNavbar>} />
+            <Route exact path='/mortgage' render={() => <MyNavbar handleLogout={this.handleLogout}> <Mortgage /></MyNavbar>} />
+            <Route exact path='/Preview' render={() => <MyNavbar handleLogout={this.handleLogout}> <Preview /></MyNavbar>} />
+            <Route exact path='/paymentLoan' render={() => <MyNavbar handleLogout={this.handleLogout}> <PaymentLoan /></MyNavbar>} />
+            <Route exact path='/paymentScheduler' render={() => <MyNavbar handleLogout={this.handleLogout}> <PaymentScheduler /></MyNavbar>} />
+            <Route exact path='/config' render={() => <MyNavbar handleLogout={this.handleLogout}> <Config /></MyNavbar>} />
+          </div>
+      )
+    }
 
-
-  )
-
+    return (
+      <Router history={history}>
+        <Fragment>
+          <Switch>
+            {routes}
+          </Switch>
+        </Fragment>
+      </Router>
+    )
+  }
 }
-
-
 
 export default App;
