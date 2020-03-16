@@ -17,7 +17,7 @@ import Container from '@material-ui/core/Container';
 
 const useStyles = makeStyles(theme => ({
     paper: {
-        marginTop: theme.spacing(8),
+        paddingTop: theme.spacing(8),
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
@@ -62,7 +62,7 @@ export default function SignIn(props) {
         autoComplete="current-password"
     />)
     return (
-        <Container component="main" maxWidth="xs">
+        <Container component="main" maxWidth="xs" height="100vh">
         <CssBaseline />
         <div className={classes.paper}>
             <Avatar className={classes.avatar}>

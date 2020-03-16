@@ -17,9 +17,12 @@
     right: 1rem;
     color: rgba(0,0,0,.87);
 }
-
+.name-wd2 {
+    width: 150px;
+    margin-top: 10px;
+}
 .reportCol {
-    width: 300px;
+    width: 400px;
     display: flex;
     margin-top: 10px;
     margin-left: auto;

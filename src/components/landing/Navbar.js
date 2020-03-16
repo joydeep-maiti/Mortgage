@@ -7,6 +7,9 @@ import IconButton from '@material-ui/core/IconButton';
 import AccountCircle from '@material-ui/icons/AccountCircle';
 import MenuItem from '@material-ui/core/MenuItem';
 import Menu from '@material-ui/core/Menu';
+import Radio from '@material-ui/core/Radio';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import RadioGroup from '@material-ui/core/RadioGroup';
 import axios from 'axios';
 import './style.css'
 import { Data } from '../../config'
@@ -30,7 +33,8 @@ export default class MyNavbar extends React.Component {
                 type: 3,
             },
             showDateField: false,
-            anchorEl: null
+            anchorEl: null,
+            selectedValue : 'ALL'
         }
     }
 
@@ -73,18 +77,42 @@ export default class MyNavbar extends React.Component {
 
     onSubmitClick = () => {
         const reportInput = this.state.reportReq
-        if((reportInput.startDate=="" && reportInput.type===1) || (reportInput.startDate==null && reportInput.type===1) ||(reportInput.endDate=="" && reportInput.type===1) || (reportInput.endDate==null && reportInput.type===1) || reportInput.reqId=="" || reportInput.reqId==null ||reportInput.type=="" || reportInput.type==null){
-            alert("All Fields are required");
+        if( this.state.selectedValue == 'APP' ){
+            if( reportInput.reqId=="" || reportInput.reqId==null ){
+                alert("All Fields are required");
+                return
+            }else if((reportInput.startDate=="" && reportInput.type===1) || (reportInput.startDate==null && reportInput.type===1) ||(reportInput.endDate=="" && reportInput.type===1) || (reportInput.endDate==null && reportInput.type===1) || reportInput.type=="" || reportInput.type==null){
+                alert("All Fields are required");
+                return;
+            }else {
+                this.fetchReportData(reportInput.reqId);
+            }
+           
         }else {
-            this.fetchReportData(reportInput.reqId);
+            if((reportInput.startDate=="" && reportInput.type===1) || (reportInput.startDate==null && reportInput.type===1) ||(reportInput.endDate=="" && reportInput.type===1) || (reportInput.endDate==null && reportInput.type===1) || reportInput.type=="" || reportInput.type==null){
+                alert("All Fields are required");
+                return;
+            }else {
+                this.fetchReportData();
+            }
         }
+        
     }
 
     fetchReportData = (reqId) => {
-        let reqid = `Req${('000000' + reqId).slice(-5)}`;
-        console.log("Req Id", reqid)
+        console.log('===============reqId', reqId);
+        let url = null
+        if( reqId == undefined){
+            url = `${Data.url}/users`
+        }else {
+            let reqid = `Req${('000000' + reqId).slice(-5)}`;
+            // console.log("Req Id", reqid)
+            url = `${Data.url}/users/${reqid}`;
+        }
+        console.log('----------URL', url);
+        return;
         const self = this;
-        axios.get(`${Data.url}/users/${reqid}`)
+        axios.get(url)
         .then(res => {
             console.log("fetchReportData", res);
             if(res.status === 200){
@@ -327,11 +355,17 @@ export default class MyNavbar extends React.Component {
             anchorEl: el
         })
     }
+
+    handleChange = event => {
+        this.setState({
+            selectedValue : event.target.value
+        })
+    };
    
     render() {
         const stateOptions = [
             { key: "1", text: "Paid Emi", value: 1},
-            { key: "2", text: "UnPaid Emi", value: 2},
+            { key: "2", text: "Unpaid Emi", value: 2},
             { key: "3", text: "All", value: 3},
         ]
 
@@ -405,19 +439,40 @@ export default class MyNavbar extends React.Component {
                         <Modal.Content>
                             <Modal.Description>
                             {/* <Header>Default Profile Image</Header> */}
-                            <Row >
+                        <Row >
                             <Col className="same-row">
                                 <div className="reportCol">
-                                    <div className="name-wd" style={{textAlign:"right", marginRight:10}} >
+                                    <div className="name-wd2" style={{textAlign:"right", marginRight:10}} >
+                                        Application Type. <sup style={{ color: 'red' }}>*</sup>&nbsp;&nbsp;:
+                                    </div>
+                                    <div className="ui input" style={{width:"200px"}}>
+                                    <RadioGroup aria-label="position" name="position" value={this.state.selectedValue} onChange={this.handleChange} row>
+                                        <FormControlLabel
+                                            value="ALL"
+                                            control={<Radio color="primary" />}
+                                            label="All"
+                                            labelPlacement="end"
+                                        />
+                                        <FormControlLabel
+                                            value="APP"
+                                            control={<Radio color="primary" />}
+                                            label="Application No"
+                                            labelPlacement="end"
+                                        />
+                                    </RadioGroup>
+
+                                    </div>
+                                </div>
+                            </Col>
+                        </Row>
+                        <Row style={this.state.selectedValue === 'APP'?{display:"block"}:{display:"none"}}>
+                            <Col className="same-row">
+                                <div className="reportCol">
+                                    <div className="name-wd2" style={{textAlign:"right", marginRight:10}} >
                                         Request No. <sup style={{ color: 'red' }}>*</sup>&nbsp;&nbsp;:
                                     </div >
-                                    <div className="ui input" style={{width:"196px"}}>
+                                    <div className="ui input" style={{width:"200px"}}>
                                         <input type="text" name="reqno" placeholder="Request No." required onChange={(e,data) => this.handleOnChange(e,data,"req" )} value={this.state.reportReq.reqId} required/>
-                                        {/* <input type="text"
-                                        style={{ borderColor: this.state.errorBorder ? this.state.errorBorder : '' }}
-                                        name="fname" onChange={(e) => this.handleOnChange(e)}
-                                        placeholder="firstName"
-                                        defaultValue={this.state.user.fname && this.state.user.fname} required /> */}
                                     </div>
                                 </div>
                             </Col>
@@ -425,10 +480,10 @@ export default class MyNavbar extends React.Component {
                         <Row >
                             <Col className="same-row">
                                 <div className="reportCol">
-                                    <div className="name-wd" style={{textAlign:"right", marginRight:10}}>
-                                    Type<sup style={{ color: 'red' }}>*</sup>:
+                                    <div className="name-wd2" style={{textAlign:"right", marginRight:10}}>
+                                    Report Type<sup style={{ color: 'red' }}>*</sup>:
                                     </div>
-                                    <div className="ui input">
+                                    <div className="ui input" style={{width:"200px"}}>
                                         <Dropdown placeholder='Report Type' search selection options={stateOptions} onChange={(e,data) => this.handleOnChange(e,data,"type")} defaultValue={this.state.reportReq.type} required/>
                                     </div>
                                 </div>
@@ -437,10 +492,10 @@ export default class MyNavbar extends React.Component {
                         <Row style={this.state.reportReq.type === 1?{display:"block"}:{display:"none"}}>
                             <Col className="same-row" >
                                 <div className="reportCol">
-                                    <div className="name-wd" style={{textAlign:"right", marginRight:10}}>
+                                    <div className="name-wd2" style={{textAlign:"right", marginRight:10}}>
                                         Start date<sup style={{ color: 'red' }}>*</sup>&nbsp;&nbsp;:
                                     </div >
-                                    <div className="ui input" style={{width:"196px"}}>
+                                    <div className="ui input" style={{width:"200px"}}>
                                         <input type="date" name="Date" placeholder="Start Date" onChange={(e,data) => this.handleOnChange(e,data,"startDate" )} value={this.state.reportReq.startDate} required/>
                                     </div>
                                 </div>
@@ -450,10 +505,10 @@ export default class MyNavbar extends React.Component {
                         <Row style={this.state.reportReq.type === 1?{display:"block"}:{display:"none"}}>
                             <Col className="same-row">
                                 <div className="reportCol">
-                                    <div className="name-wd" style={{textAlign:"right", marginRight:10}}>
+                                    <div className="name-wd2" style={{textAlign:"right", marginRight:10}}>
                                         End date<sup style={{ color: 'red' }}>*</sup>&nbsp;&nbsp;:
                                     </div >
-                                    <div className="ui input" style={{width:"196px"}}>
+                                    <div className="ui input" style={{width:"200px"}}>
                                         <input type="date" name="Date" placeholder="End Date" onChange={(e,data) => this.handleOnChange(e,data,"endDate" )} value={this.state.reportReq.endDate} required/>
                                     </div>
                                 </div>
