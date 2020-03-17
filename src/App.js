@@ -83,7 +83,10 @@ class App extends React.Component {
     let routes = null
     if(!this.state.auth.authentication){
       return(
-        <SignIn handleSignin={(userName)=>this.handleSignin(userName)}/>
+        <div className="signin">
+          <SignIn handleSignin={(userName)=>this.handleSignin(userName)}/>
+        </div>
+        
       )
     }else {
       routes = (

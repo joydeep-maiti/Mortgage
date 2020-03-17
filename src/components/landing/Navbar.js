@@ -34,7 +34,8 @@ export default class MyNavbar extends React.Component {
             },
             showDateField: false,
             anchorEl: null,
-            selectedValue : 'ALL'
+            selectedValue : 'ALL',
+            selectedtypeValue : 'Status'
         }
     }
 
@@ -527,6 +528,11 @@ export default class MyNavbar extends React.Component {
             selectedValue : event.target.value
         })
     };
+    handleTypeChange = event => {
+        this.setState({
+            selectedtypeValue : event.target.value
+        })
+    };
    
     render() {
         const stateOptions = [
@@ -606,6 +612,28 @@ export default class MyNavbar extends React.Component {
                             <Modal.Description>
                             {/* <Header>Default Profile Image</Header> */}
                         <Row >
+                            <RadioGroup aria-label="position" name="position" style={{ marginLeft:'auto', marginRight:'auto'}} value={this.state.selectedtypeValue} onChange={this.handleTypeChange} row>
+                                <FormControlLabel
+                                    value="Status"
+                                    control={<Radio color="primary" />}
+                                    label="Status Report"
+                                    labelPlacement="end"
+                                />
+                                <FormControlLabel
+                                    value="EMI"
+                                    control={<Radio color="primary" />}
+                                    label="EMI Schedular"
+                                    labelPlacement="end"
+                                />
+                                <FormControlLabel
+                                    value="Month"
+                                    control={<Radio color="primary" />}
+                                    label="Next Month EMIs"
+                                    labelPlacement="end"
+                                />
+                            </RadioGroup>
+                        </Row>
+                        <Row >
                             <Col className="same-row">
                                 <div className="reportCol">
                                     <div className="name-wd2" style={{textAlign:"right", marginRight:10}} >
@@ -643,11 +671,11 @@ export default class MyNavbar extends React.Component {
                                 </div>
                             </Col>
                         </Row>
-                        <Row >
+                        <Row style={this.state.selectedtypeValue === 'EMI'?{display:"block"}:{display:"none"}}>
                             <Col className="same-row">
                                 <div className="reportCol">
                                     <div className="name-wd2" style={{textAlign:"right", marginRight:10}}>
-                                    Report Type<sup style={{ color: 'red' }}>*</sup>:
+                                    Report Filter<sup style={{ color: 'red' }}>*</sup>:
                                     </div>
                                     <div className="ui input" style={{width:"200px"}}>
                                         <Dropdown placeholder='Report Type' search selection options={stateOptions} onChange={(e,data) => this.handleOnChange(e,data,"type")} defaultValue={this.state.reportReq.type} required/>
