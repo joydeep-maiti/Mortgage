@@ -126,7 +126,7 @@ export default class MyNavbar extends React.Component {
                     let response = []
                     response.push(res.data);
                     this.setState({
-                        user: response
+                        applications: response
                     },
                         ()=>self.exportPDF('APP')
                     )
@@ -144,16 +144,10 @@ export default class MyNavbar extends React.Component {
 
     exportPDF = (el) => {
         console.log("-------------------STATE", this.state);
-        if(el === 'ALL'){
 
-        }else if(el === 'APP'){
-
-        }
-        // return;
         let type = this.state.reportReq.type
         let condition = type === 1 ? "PAID":type === 2 ? "UNPAId":"ALL"
         
-
         const unit = "pt";
         const size = "A4"; // Use A1, A2, A3 or A4
         const orientation = "portrait"; // portrait or landscape
@@ -162,8 +156,6 @@ export default class MyNavbar extends React.Component {
         const marginLeft2 = 350;
         const basePosition = 130;
         const doc = new jsPDF(orientation, unit, size);
-    
-        
     
         let title = "Payement Scheduler";
         let headers = [["SNo", "Month","Principal","Interest","Total EMI","Amount Paid","Balance EMI","Outstanding Amount","Penalty"]];
@@ -180,19 +172,10 @@ export default class MyNavbar extends React.Component {
             applicationsEmiJsonArray = self.getUnpaidEmiData();
                         break;
         }
-        // console.log("---------------applicationsEmiJsonArray",applicationsEmiJsonArray)
-        // return;
+        console.log("---------------applicationsEmiJsonArray",applicationsEmiJsonArray)
         let flag = 0;
         let pageCount = 0;
-        // let footer = function (data) {
-        //     doc.setFontSize(10);
-        //     doc.setFontStyle('normal');
-        //     let pageCount = pageCount + data.pageCount
-        //     var str ="Page " + pageCount;
-        //     doc.text(str, data.settings.margin.left, doc.internal.pageSize.height - 30);
-        //     // var today = new moment().format("YYYY-MM-DD");
-        //     // doc.text(today, right, doc.internal.pageSize.height - 30, 'right');
-        // };
+       
 
         for( let i=0 ; i<applicationsEmiJsonArray.length ; i++ ){
 
@@ -238,18 +221,9 @@ export default class MyNavbar extends React.Component {
             
         }
         console.log("------------------page no", doc.internal.getNumberOfPages())
-        // doc.autoTable({ html: '#emiTable' })
         doc.save(this.state.user.id+".pdf")
     }
-    // , [], {
-    //     afterPageContent: footer,
-    //     headerStyles: {
-    //         fillColor: 255,
-    //         textColor: 0,
-    //         fontStyle: 'bold',
-    //         rowHeight: 20
-    //     }
-    // }
+
     getAllEmiData = () => {
         let applicationsEmiJsonArray = []
         let applications = this.state.applications
@@ -300,32 +274,150 @@ export default class MyNavbar extends React.Component {
     }
 
     getPaidEmiData = () => {
-        totalEmiPaid = 0;
-        
-        console.log("============= in get paid emi",)
-        if( !this.state.user.emiScheduler ){
-            alert("No Paid Emis found");
-            return
+        let applicationsEmiJsonArray = []
+        let applications = this.state.applications
+        for(let i = 0 ; i < applications.length ; i++){
+            totalEmiPaid = 0;
+            console.log("============= in get paid emi",)
+            let emidatas = applications[i].emiScheduler
+            let startdate = this.state.reportReq.startDate
+            let enddate = this.state.reportReq.endDate
+            let data = []
+            emidatas.map((el,i)=> {
+                totalEmiPaid += el.paidEmi!== undefined?parseInt(el.paidEmi):parseInt(0);
+                if(el.paidEmi !== undefined){
+                    let date = el.month.split("-");
+                    let day = date[0];
+                    let mon = date[1];
+                    let yr = date[2];
+                    date = yr + '-' + mon + '-' + day;
+                    if( date >= startdate && date <= enddate){
+                        console.log("-----------Start lesser than Emi",date, startdate, enddate)
+                        data.push([
+                            i+1,
+                            el.month!== undefined?el.month:"Nil", 
+                            el.principal!== undefined?el.principal:"Nil",
+                            el.interest!== undefined?el.interest:"Nil",
+                            el.emi!== undefined?el.emi:"Nil",
+                            el.paidEmi!== undefined?el.paidEmi:"Nil",
+                            el.balEmi !== undefined?el.balEmi:"Nil",
+                            el.outstandingBal?el.outstandingBal:0,
+                            el.unpaidPen !== undefined?el.unpaidPen:"Nil"
+                        ])
+                    }
+    
+                }
+            });
+            // console.log()
+            if(data.length>0){
+                data.push([
+                    "",
+                    "Total",
+                    "",
+                    "",
+                    "",
+                    totalEmiPaid,
+                    "",
+                    "",
+                    ""
+                ])
+                let applicationsEmiJson =  {
+                    user : applications[i].user,
+                    expLoans : applications[i].expLoans,
+                    id : applications[i].id,
+                    emiTableData : data
+                }
+    
+                applicationsEmiJsonArray.push(applicationsEmiJson);
+            }  
+
         }
-        let emidatas = this.state.user.emiScheduler 
-        let data = [];
-
-        let startdate = this.state.reportReq.startDate
-        let enddate = this.state.reportReq.endDate
         
-        emidatas.map((el,i)=> {
-            totalEmiPaid += el.paidEmi!== undefined?parseInt(el.paidEmi):parseInt(0);
-            if(el.paidEmi !== undefined){
-                let date = el.month.split("-");
-                let day = date[0];
-                let mon = date[1];
-                let yr = date[2];
-                date = yr + '-' + mon + '-' + day;
+        // console.log("-------------applicationsEmiJsonArray", applicationsEmiJsonArray);
+        return applicationsEmiJsonArray;
+    }
 
-                if( date >= startdate && date <= enddate){
-                    console.log("-----------Start lesser than Emi",date, startdate, enddate)
+    // getPaidEmiData = () => {
+    //     totalEmiPaid = 0;
+        
+    //     console.log("============= in get paid emi",)
+    //     if( !this.state.user.emiScheduler ){
+    //         alert("No Paid Emis found");
+    //         return
+    //     }
+    //     let emidatas = this.state.user.emiScheduler 
+    //     let data = [];
+
+    //     let startdate = this.state.reportReq.startDate
+    //     let enddate = this.state.reportReq.endDate
+        
+    //     emidatas.map((el,i)=> {
+    //         totalEmiPaid += el.paidEmi!== undefined?parseInt(el.paidEmi):parseInt(0);
+    //         if(el.paidEmi !== undefined){
+    //             let date = el.month.split("-");
+    //             let day = date[0];
+    //             let mon = date[1];
+    //             let yr = date[2];
+    //             date = yr + '-' + mon + '-' + day;
+
+    //             if( date >= startdate && date <= enddate){
+    //                 console.log("-----------Start lesser than Emi",date, startdate, enddate)
+    //                 data.push([
+    //                     i+1,
+    //                     el.month!== undefined?el.month:"Nil", 
+    //                     el.principal!== undefined?el.principal:"Nil",
+    //                     el.interest!== undefined?el.interest:"Nil",
+    //                     el.emi!== undefined?el.emi:"Nil",
+    //                     el.paidEmi!== undefined?el.paidEmi:"Nil",
+    //                     el.balEmi !== undefined?el.balEmi:"Nil",
+    //                     el.outstandingBal?el.outstandingBal:0,
+    //                     el.unpaidPen !== undefined?el.unpaidPen:"Nil"
+    //                 ])
+    //             }
+                
+                
+    //         }
+    //     });
+    //     if(data.length === 0){
+    //         alert("No Paid Emi data found for the time period")
+    //         return
+    //     }
+    //     data.push([
+    //         "",
+    //         "Total",
+    //         "",
+    //         "",
+    //         "",
+    //         totalEmiPaid,
+    //         "",
+    //         "",
+    //         ""
+    //     ])
+
+    //     return data;
+    // }
+
+    getUnpaidEmiData = () => {
+        let applicationsEmiJsonArray = []
+        let applications = this.state.applications
+        for(let i = 0 ; i < applications.length ; i++){
+            totalEmiPaid = 0;
+            let data = [];
+            let count = 1;
+            totalEmiPaid = 0;
+            let totalDue =0 ;
+            let flag = 0;
+            console.log("============= in get unpaid emi")
+            let emidatas = applications[i].emiScheduler ? applications[i].emiScheduler : applications[i].totalEmi
+            emidatas.map((el,i)=> {
+                totalEmiPaid += el.paidEmi!== undefined?parseInt(el.paidEmi):parseInt(0);
+                if(el.paidEmi == undefined){
+                    if(flag == 0){
+                        totalDue = el.outstandingBal
+                        flag =1;
+                    }
                     data.push([
-                        i+1,
+                        count,
                         el.month!== undefined?el.month:"Nil", 
                         el.principal!== undefined?el.principal:"Nil",
                         el.interest!== undefined?el.interest:"Nil",
@@ -335,75 +427,83 @@ export default class MyNavbar extends React.Component {
                         el.outstandingBal?el.outstandingBal:0,
                         el.unpaidPen !== undefined?el.unpaidPen:"Nil"
                     ])
+                    count++;
+    
                 }
-                
-                
-            }
-        });
-        if(data.length === 0){
-            alert("No Paid Emi data found for the time period")
-            return
-        }
-        data.push([
-            "",
-            "Total",
-            "",
-            "",
-            "",
-            totalEmiPaid,
-            "",
-            "",
-            ""
-        ])
-
-        return data;
-    }
-
-    getUnpaidEmiData = () => {
-        console.log("============= in get paid emi",)
-        let data = [];
-        let count = 1;
-        totalEmiPaid = 0;
-        let totalDue =0 ;
-        let flag = 0;
-        let emidatas = this.state.user.emiScheduler ? this.state.user.emiScheduler : this.state.user.totalEmi
-        emidatas.map((el,i)=> {
-            totalEmiPaid += el.paidEmi!== undefined?parseInt(el.paidEmi):parseInt(0);
-            if(el.paidEmi == undefined){
-                if(flag == 0){
-                    totalDue = el.outstandingBal
-                    flag =1;
-                }
+            });
+            if(data.length>0){
                 data.push([
-                    count,
-                    el.month!== undefined?el.month:"Nil", 
-                    el.principal!== undefined?el.principal:"Nil",
-                    el.interest!== undefined?el.interest:"Nil",
-                    el.emi!== undefined?el.emi:"Nil",
-                    el.paidEmi!== undefined?el.paidEmi:"Nil",
-                    el.balEmi !== undefined?el.balEmi:"Nil",
-                    el.outstandingBal?el.outstandingBal:0,
-                    el.unpaidPen !== undefined?el.unpaidPen:"Nil"
+                    "",
+                    "Total",
+                    "",
+                    "",
+                    "",
+                    totalEmiPaid,
+                    "",
+                    "",
+                    ""
                 ])
-                count++;
+                let applicationsEmiJson =  {
+                    user : applications[i].user,
+                    expLoans : applications[i].expLoans,
+                    id : applications[i].id,
+                    emiTableData : data
+                }
+    
+                applicationsEmiJsonArray.push(applicationsEmiJson);
+            }  
 
-            }
-            
-        });
-        data.push([
-            "",
-            "Total Due",
-            "",
-            "",
-            "",
-            "",
-            "",
-            totalDue,
-            ""
-        ])
-
-        return data;
+        }
+        
+        // console.log("-------------applicationsEmiJsonArray", applicationsEmiJsonArray);
+        return applicationsEmiJsonArray;
     }
+
+    // getUnpaidEmiData = () => {
+    //     console.log("============= in get paid emi",)
+    //     let data = [];
+    //     let count = 1;
+    //     totalEmiPaid = 0;
+    //     let totalDue =0 ;
+    //     let flag = 0;
+    //     let emidatas = this.state.user.emiScheduler ? this.state.user.emiScheduler : this.state.user.totalEmi
+    //     emidatas.map((el,i)=> {
+    //         totalEmiPaid += el.paidEmi!== undefined?parseInt(el.paidEmi):parseInt(0);
+    //         if(el.paidEmi == undefined){
+    //             if(flag == 0){
+    //                 totalDue = el.outstandingBal
+    //                 flag =1;
+    //             }
+    //             data.push([
+    //                 count,
+    //                 el.month!== undefined?el.month:"Nil", 
+    //                 el.principal!== undefined?el.principal:"Nil",
+    //                 el.interest!== undefined?el.interest:"Nil",
+    //                 el.emi!== undefined?el.emi:"Nil",
+    //                 el.paidEmi!== undefined?el.paidEmi:"Nil",
+    //                 el.balEmi !== undefined?el.balEmi:"Nil",
+    //                 el.outstandingBal?el.outstandingBal:0,
+    //                 el.unpaidPen !== undefined?el.unpaidPen:"Nil"
+    //             ])
+    //             count++;
+
+    //         }
+            
+    //     });
+    //     data.push([
+    //         "",
+    //         "Total Due",
+    //         "",
+    //         "",
+    //         "",
+    //         "",
+    //         "",
+    //         totalDue,
+    //         ""
+    //     ])
+
+    //     return data;
+    // }
     handleMenu = event => {
         this.setAnchorEl(event.currentTarget);
     };
