@@ -41,15 +41,23 @@ export default function SignIn(props) {
     const classes = useStyles();
 
     const [state, setState] = React.useState({
-        checked : true
+        checked : true,
+        username : "",
+        password : ""
     });
     
     const handleChange = name => event => {
+        console.log("----in handle change",name,event)
         setState({ ...state, [name]: event.target.checked });
     };
 
+    const handleInputChange = name => event => {
+        console.log("----in handle change",name,event)
+        setState({ ...state, [name]: event.target.value });
+    };
+
     const handleSignin = () =>  {
-        props.handleSignin("userName");
+        props.handleSignin(state);
     };
 
     const passfield = state.checked ? "":(<TextField
@@ -62,6 +70,8 @@ export default function SignIn(props) {
         type="password"
         id="password"
         autoComplete="current-password"
+        value = {state.password}
+        onChange={handleInputChange("password")}
     />)
     return (
         <Container component="main" maxWidth="xs" height="100vh">
@@ -80,11 +90,13 @@ export default function SignIn(props) {
                 margin="normal"
                 required
                 fullWidth
-                id="email"
+                id="username"
                 label="Username"
                 name="username"
-                autoComplete="username"
+                // autoComplete="username"
                 autoFocus
+                // value = {state.username}
+                onChange={handleInputChange("username")}
             />
             {passfield}
             <FormControlLabel
@@ -92,7 +104,7 @@ export default function SignIn(props) {
                 label="Sign In using SSO"
             />
             <Button
-                type="submit"
+                // type="submit"
                 fullWidth
                 variant="contained"
                 color="primary"

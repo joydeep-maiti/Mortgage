@@ -12,6 +12,8 @@ import PaymentScheduler from './components/payments/PaymentScheduler'
 import { history } from "../src/components/helpers/history"
 import Config from './components/Config/Config'
 import SignIn from './components/Login/SignIn'
+import axios from 'axios'
+import { Data } from './config'
 
 class App extends React.Component {
   state = {
@@ -31,16 +33,33 @@ class App extends React.Component {
     }
   }
 
-  handleSignin = (userName) => {
-    this.setState({
-      auth:{
-        authentication : true,
-        username: userName,
-        userrole :"ADMIN"
-      }
-    },
-    ()=> localStorage.setItem("Auth", JSON.stringify(this.state.auth))
-    )
+  handleSignin = (state) => {
+    console.log("-----in handleSignin",state)
+    this.checkUserAuthentication(state.username)
+    
+  }
+
+  checkUserAuthentication = (username)=> {
+      axios.get(`${Data.url}/user?username=${username}`)
+      .then(res => {
+          console.log("gettingUserAuthData data", res);
+          if(res.status === 200 && res.data.length == 1){
+            this.setState({
+              auth:{
+                authentication : true,
+                username: username,
+                userrole :"ADMIN"
+              }
+            },
+            ()=> localStorage.setItem("Auth", JSON.stringify(this.state.auth))
+            )
+          }else{
+            alert("Username incorrect")
+          }
+      })
+      .catch(e => {
+          window.alert("Login Error")
+      });
   }
 
   handleLogout = () => {
