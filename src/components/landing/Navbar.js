@@ -17,6 +17,7 @@ import jsPDF from 'jspdf';
 import "jspdf-autotable";
 import Logo from '../../logo.jpg'
 
+
 let totalEmiPaid = 0;
 
 export default class MyNavbar extends React.Component {
@@ -147,7 +148,7 @@ export default class MyNavbar extends React.Component {
         console.log("-------------------STATE", this.state);
 
         let type = this.state.reportReq.type
-        let condition = type === 1 ? "PAID":type === 2 ? "UNPAId":"ALL"
+        let condition = type === 1 ? "PAID":type === 2 ? "UNPAId":type === 4 ? "STATUS":type === 5 ? "NEXT":"ALL"
         
         const unit = "pt";
         const size = "A4"; // Use A1, A2, A3 or A4
@@ -159,8 +160,9 @@ export default class MyNavbar extends React.Component {
         const doc = new jsPDF(orientation, unit, size);
     
         let title = "Payement Scheduler";
-        let headers = [["SNo", "Month","Principal","Interest","Total EMI","Amount Paid","Balance EMI","Outstanding Amount","Penalty"]];
         let applicationsEmiJsonArray = []
+        let applicationsStatusArray = []
+        let nextMonthDataArray = []
         const self = this;
         switch(condition){
             case "ALL": title = "Payment Scheduler";
@@ -172,21 +174,74 @@ export default class MyNavbar extends React.Component {
             case "UNPAId": title = "EMI Due Report";
             applicationsEmiJsonArray = self.getUnpaidEmiData();
                         break;
+            case "STATUS": title = "Status Report";
+            applicationsStatusArray = self.getStatusReportData();
+                        break;
+            case "NEXT": title = "Next Month Data";
+            nextMonthDataArray = self.getnextMonthData();
+                        break;
         }
+
         console.log("---------------applicationsEmiJsonArray",applicationsEmiJsonArray)
+        console.log("---------------applicationsStatusArray",applicationsStatusArray)
+        console.log("---------------nextMonthDataArray",nextMonthDataArray)
+        // return
         let flag = 0;
         let pageCount = 0;
        
+        if( condition === "ALL" || condition === "UNPAId" || condition === "PAID"){
+            let headers = [["SNo", "Month","Principal","Interest","Total EMI","Amount Paid","Balance EMI","Outstanding Amount","Penalty"]];
+            for( let i=0 ; i<applicationsEmiJsonArray.length ; i++ ){
 
-        for( let i=0 ; i<applicationsEmiJsonArray.length ; i++ ){
-
-            let loan = applicationsEmiJsonArray[i].expLoans;
-            let user = applicationsEmiJsonArray[i].user;
-            let reqId = applicationsEmiJsonArray[i].id;
+                let loan = applicationsEmiJsonArray[i].expLoans;
+                let user = applicationsEmiJsonArray[i].user;
+                let reqId = applicationsEmiJsonArray[i].id;
+                let content = {
+                    startY: basePosition+100,
+                    head: headers,
+                    body: applicationsEmiJsonArray[i].emiTableData,
+                    theme: 'grid',
+                    styles: {
+                    cellWidth:'wrap',
+                    halign: 'center',
+                    },
+                    margin: marginLeft
+                };
+                
+                if(flag == 1){
+                    doc.addPage(orientation, unit, size )
+                }
+                if(flag == 0){
+                    flag = 1;
+                }
+                doc.setFontSize(20);
+                doc.text(title, 200, 100);
+                doc.setFontSize(15);
+                
+                doc.text("Loan Details",marginLeft, basePosition);
+                doc.text("Customer Details",marginLeft2, basePosition);
+                doc.setFontSize(12);
+                doc.text("Req No.: "+reqId,marginLeft, basePosition+20);
+                doc.text("Principle Amount : "+loan.principle,marginLeft, basePosition+35);
+                doc.text("Tenure : "+loan.tenure+" Months",marginLeft, basePosition+50);
+                doc.text("Current Interest Rate : "+loan.intrest+"%",marginLeft, basePosition+65);
+                doc.text("Start Date : "+loan.startDate,marginLeft, basePosition+80);
+        
+                doc.text("User Name : "+user.fname + " "+ user.lname,marginLeft2, basePosition+20);
+                doc.text("Mobile No. : "+user.mobileNo,marginLeft2, basePosition+35);
+        
+                doc.autoTable(content);
+                console.log("------------------page no", doc.internal.getNumberOfPages());
+                
+            }
+            // console.log("------------------page no", doc.internal.getNumberOfPages())
+            doc.save("EMI Schedular.pdf")
+        }else if( condition === "STATUS" ){
+            let headers = [["SNo","Application Id", "Name","Mortgage","Principal","Tenure(Months)","Interest(%)","Start Date","Status"]];
             let content = {
-                startY: basePosition+100,
+                startY: basePosition+30,
                 head: headers,
-                body: applicationsEmiJsonArray[i].emiTableData,
+                body: applicationsStatusArray,
                 theme: 'grid',
                 styles: {
                 cellWidth:'wrap',
@@ -194,35 +249,28 @@ export default class MyNavbar extends React.Component {
                 },
                 margin: marginLeft
             };
-            
-            if(flag == 1){
-                doc.addPage(orientation, unit, size )
-            }
-            if(flag == 0){
-                flag = 1;
-            }
             doc.setFontSize(20);
-            doc.text(title, 200, 100);
-            doc.setFontSize(15);
-            
-            doc.text("Loan Details",marginLeft, basePosition);
-            doc.text("Customer Details",marginLeft2, basePosition);
-            doc.setFontSize(12);
-            doc.text("Req No.: "+reqId,marginLeft, basePosition+20);
-            doc.text("Principle Amount : "+loan.principle,marginLeft, basePosition+35);
-            doc.text("Tenure : "+loan.tenure+" Months",marginLeft, basePosition+50);
-            doc.text("Current Interest Rate : "+loan.intrest+"%",marginLeft, basePosition+65);
-            doc.text("Start Date : "+loan.startDate,marginLeft, basePosition+80);
-    
-            doc.text("User Name : "+user.fname + " "+ user.lname,marginLeft2, basePosition+20);
-            doc.text("Mobile No. : "+user.mobileNo,marginLeft2, basePosition+35);
-    
+            doc.text(title, 235, 100);
             doc.autoTable(content);
-            console.log("------------------page no", doc.internal.getNumberOfPages());
-            
+            doc.save("Status Report.pdf")
+        }else if( condition === "NEXT" ){
+            let headers = [["SNo","Application Id", "Name","Mortgage","Principal","Tenure(Months)","Interest(%)","Start Date","EMI Amount"]];
+            let content = {
+                startY: basePosition+30,
+                head: headers,
+                body: nextMonthDataArray,
+                theme: 'grid',
+                styles: {
+                cellWidth:'wrap',
+                halign: 'center',
+                },
+                margin: marginLeft
+            };
+            doc.setFontSize(20);
+            doc.text(title, 235, 100);
+            doc.autoTable(content);
+            doc.save("Next Month Data.pdf")
         }
-        console.log("------------------page no", doc.internal.getNumberOfPages())
-        doc.save(this.state.user.id+".pdf")
     }
 
     getAllEmiData = () => {
@@ -338,66 +386,6 @@ export default class MyNavbar extends React.Component {
         return applicationsEmiJsonArray;
     }
 
-    // getPaidEmiData = () => {
-    //     totalEmiPaid = 0;
-        
-    //     console.log("============= in get paid emi",)
-    //     if( !this.state.user.emiScheduler ){
-    //         alert("No Paid Emis found");
-    //         return
-    //     }
-    //     let emidatas = this.state.user.emiScheduler 
-    //     let data = [];
-
-    //     let startdate = this.state.reportReq.startDate
-    //     let enddate = this.state.reportReq.endDate
-        
-    //     emidatas.map((el,i)=> {
-    //         totalEmiPaid += el.paidEmi!== undefined?parseInt(el.paidEmi):parseInt(0);
-    //         if(el.paidEmi !== undefined){
-    //             let date = el.month.split("-");
-    //             let day = date[0];
-    //             let mon = date[1];
-    //             let yr = date[2];
-    //             date = yr + '-' + mon + '-' + day;
-
-    //             if( date >= startdate && date <= enddate){
-    //                 console.log("-----------Start lesser than Emi",date, startdate, enddate)
-    //                 data.push([
-    //                     i+1,
-    //                     el.month!== undefined?el.month:"Nil", 
-    //                     el.principal!== undefined?el.principal:"Nil",
-    //                     el.interest!== undefined?el.interest:"Nil",
-    //                     el.emi!== undefined?el.emi:"Nil",
-    //                     el.paidEmi!== undefined?el.paidEmi:"Nil",
-    //                     el.balEmi !== undefined?el.balEmi:"Nil",
-    //                     el.outstandingBal?el.outstandingBal:0,
-    //                     el.unpaidPen !== undefined?el.unpaidPen:"Nil"
-    //                 ])
-    //             }
-                
-                
-    //         }
-    //     });
-    //     if(data.length === 0){
-    //         alert("No Paid Emi data found for the time period")
-    //         return
-    //     }
-    //     data.push([
-    //         "",
-    //         "Total",
-    //         "",
-    //         "",
-    //         "",
-    //         totalEmiPaid,
-    //         "",
-    //         "",
-    //         ""
-    //     ])
-
-    //     return data;
-    // }
-
     getUnpaidEmiData = () => {
         let applicationsEmiJsonArray = []
         let applications = this.state.applications
@@ -460,51 +448,79 @@ export default class MyNavbar extends React.Component {
         return applicationsEmiJsonArray;
     }
 
-    // getUnpaidEmiData = () => {
-    //     console.log("============= in get paid emi",)
-    //     let data = [];
-    //     let count = 1;
-    //     totalEmiPaid = 0;
-    //     let totalDue =0 ;
-    //     let flag = 0;
-    //     let emidatas = this.state.user.emiScheduler ? this.state.user.emiScheduler : this.state.user.totalEmi
-    //     emidatas.map((el,i)=> {
-    //         totalEmiPaid += el.paidEmi!== undefined?parseInt(el.paidEmi):parseInt(0);
-    //         if(el.paidEmi == undefined){
-    //             if(flag == 0){
-    //                 totalDue = el.outstandingBal
-    //                 flag =1;
-    //             }
-    //             data.push([
-    //                 count,
-    //                 el.month!== undefined?el.month:"Nil", 
-    //                 el.principal!== undefined?el.principal:"Nil",
-    //                 el.interest!== undefined?el.interest:"Nil",
-    //                 el.emi!== undefined?el.emi:"Nil",
-    //                 el.paidEmi!== undefined?el.paidEmi:"Nil",
-    //                 el.balEmi !== undefined?el.balEmi:"Nil",
-    //                 el.outstandingBal?el.outstandingBal:0,
-    //                 el.unpaidPen !== undefined?el.unpaidPen:"Nil"
-    //             ])
-    //             count++;
+    getStatusReportData = () => {
+        console.log("------State", this.state)
+        let data = this.state.applications.map((el,i)=> {
+            return [
+                i+1,
+                el.id, 
+                el.user.fname+" "+el.user.lname,
+                el.expLoans.propertyType,
+                el.expLoans.principle,
+                el.expLoans.tenure,
+                el.expLoans.intrest,
+                el.expLoans.startDate,
+                el.status
+            ]
 
-    //         }
+        });
+        return data
+        
+    }
+
+    getnextMonthData = () => {
+        let applications = this.state.applications
+        let totalEmi = 0;
+        let data = []
+        let count  = 1;
+        console.log("============= in getnextMonthData")
+        for(let i = 0 ; i < applications.length ; i++){
             
-    //     });
-    //     data.push([
-    //         "",
-    //         "Total Due",
-    //         "",
-    //         "",
-    //         "",
-    //         "",
-    //         "",
-    //         totalDue,
-    //         ""
-    //     ])
+            let emidatas = applications[i].emiScheduler ? applications[i].emiScheduler : applications[i].totalEmi
+            emidatas.map((el,j)=> {
+                let cdate = new Date();
+                let nxtmonth = cdate.getMonth()+2;
+                nxtmonth = nxtmonth<10?"0"+nxtmonth:nxtmonth
+                let yr = cdate.getFullYear();
+                let nxtmon = nxtmonth+"-"+yr;
+                let date = el.month.slice(3);
+                // console.log("-----------------checking for",date, nxtmon)
+                if( date == nxtmon){
+                    // console.log("--------------------nxt month",date, nxtmon)
+                    totalEmi += el.emi!== undefined?parseInt(el.emi):parseInt(0);
+                    data.push([
+                        count,
+                        applications[i].id, 
+                        applications[i].user.fname+" "+applications[i].user.lname,
+                        applications[i].expLoans.propertyType,
+                        applications[i].expLoans.principle,
+                        applications[i].expLoans.tenure,
+                        applications[i].expLoans.intrest,
+                        applications[i].expLoans.startDate,
+                        el.emi
+                    ])
+                    count++;
+                    return
+                }
+            });
+        }
+        if(data.length>0){
+            data.push([
+                "",
+                "Total",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                totalEmi
+            ])
+        } 
+        return data;
+    }
 
-    //     return data;
-    // }
+
     handleMenu = event => {
         this.setAnchorEl(event.currentTarget);
     };
@@ -538,6 +554,8 @@ export default class MyNavbar extends React.Component {
         const stateOptions = [
             { key: "1", text: "Paid Emi", value: 1},
             { key: "2", text: "Unpaid Emi", value: 2},
+            { key: "4", text: "Status Report", value: 4},
+            { key: "5", text: "Next Month Data", value: 5},
             { key: "3", text: "All", value: 3},
         ]
 
@@ -604,35 +622,11 @@ export default class MyNavbar extends React.Component {
                     </Navbar.Collapse>
                 </Navbar>
                 {this.props.children}
-                {/* <div class="reportModal"> */}
                     <Modal open={this.state.showModal} style={{height:"auto",minHeight:300,width:'40%',
-    marginLeft: '30%', marginTop:'10%',borderradius:'15px',}} closeIcon onClose={this.onCloseClick}>
+    marginLeft: '30%', marginTop:'10%',borderradius:'15px',overflow:'visible'}} closeIcon onClose={this.onCloseClick}>
                         <Modal.Header style={{textAlign: 'center'}}>Generate Report</Modal.Header>
                         <Modal.Content>
                             <Modal.Description>
-                            {/* <Header>Default Profile Image</Header> */}
-                        <Row >
-                            <RadioGroup aria-label="position" name="position" style={{ marginLeft:'auto', marginRight:'auto'}} value={this.state.selectedtypeValue} onChange={this.handleTypeChange} row>
-                                <FormControlLabel
-                                    value="Status"
-                                    control={<Radio color="primary" />}
-                                    label="Status Report"
-                                    labelPlacement="end"
-                                />
-                                <FormControlLabel
-                                    value="EMI"
-                                    control={<Radio color="primary" />}
-                                    label="EMI Schedular"
-                                    labelPlacement="end"
-                                />
-                                <FormControlLabel
-                                    value="Month"
-                                    control={<Radio color="primary" />}
-                                    label="Next Month EMIs"
-                                    labelPlacement="end"
-                                />
-                            </RadioGroup>
-                        </Row>
                         <Row >
                             <Col className="same-row">
                                 <div className="reportCol">
@@ -671,7 +665,7 @@ export default class MyNavbar extends React.Component {
                                 </div>
                             </Col>
                         </Row>
-                        <Row style={this.state.selectedtypeValue === 'EMI'?{display:"block"}:{display:"none"}}>
+                        <Row>
                             <Col className="same-row">
                                 <div className="reportCol">
                                     <div className="name-wd2" style={{textAlign:"right", marginRight:10}}>
@@ -708,28 +702,12 @@ export default class MyNavbar extends React.Component {
                                 </div>
                             </Col>
                         </Row>
-                        
-                        {/* <Row >
-                            <Col className="same-row">
-                                <div className="name-space">
-                                    <div className="name-wd">
-                                    </div >
-                                    <div className="ui input">
-                                        <Button style={{ width: '150px', color: "white", backgroundColor: 'green' }}>Generate Report</Button>
-                                    </div>
-                                </div>
-                                
-                            </Col>
-                        </Row> */}
                         <Row >
                             <Button style={{ width: '130px', color: "white", backgroundColor: 'green', marginTop:"35px",marginLeft:'auto', marginRight:'auto',padding: '8px 10px' }}onClick={this.onSubmitClick}>Generate Report</Button>
                         </Row>
                             </Modal.Description>
                         </Modal.Content>
                     </Modal>
-                {/* </div> */}
-                
-                
             </div>
         )
     }

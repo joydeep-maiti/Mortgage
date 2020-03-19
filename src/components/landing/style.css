@@ -34,6 +34,13 @@
     font-style:'Bolder';
 
 }
+.MuiDialog-paperWidthSm {
+    overflow: visible;
+    overflow-y: visible;
+}
+.MuiDialog-paper {
+    overflow-y: visible;
+}
 /* .reportModal {
     position: absolute;
     width: 100%;

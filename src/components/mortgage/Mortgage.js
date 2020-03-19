@@ -695,7 +695,7 @@ class Mortgage extends React.Component {
         }, () => {
             console.log("icon clicked", this.state.totalProperty);
         })
-        const res = await axios.post("http://localhost:4000/upload", data)
+        const res = await axios.post(`${Data.url}/upload`, data)
             .then(res => {
                 console.log(res.data, "hello")
                 this.setState({
