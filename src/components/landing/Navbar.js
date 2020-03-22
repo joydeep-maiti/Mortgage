@@ -587,10 +587,10 @@ export default class MyNavbar extends React.Component {
                     </Nav>
                     <Navbar.Collapse id="basic-navbar-nav" className="left-spacing"  >
                         <Nav className="ml-auto">
-                            <Nav.Link href="#link">Services</Nav.Link>
-                            <Nav.Link href="#link">Contact</Nav.Link>
-                        </Nav>
-                        <div>
+                            {/* <Nav.Link href="#link">Services</Nav.Link>
+                            <Nav.Link href="#link">Contact</Nav.Link> */}
+                        
+                        {/* <div> */}
                             <IconButton
                                 aria-label="account of current user"
                                 aria-controls="menu-appbar"
@@ -618,7 +618,8 @@ export default class MyNavbar extends React.Component {
                                 <MenuItem onClick={this.handleClose}>Profile</MenuItem>
                                 <MenuItem onClick={this.handleLogout}>Logout</MenuItem>
                             </Menu>
-                        </div>
+                        {/* </div> */}
+                        </Nav>
                     </Navbar.Collapse>
                 </Navbar>
                 {this.props.children}

@@ -41,14 +41,16 @@ class Mortgage extends React.Component {
             errorMsg: '',
             errorBorder: '',
             update: true,
-            propertyRate:null
-
+            propertyRate:null,
+            activeAllIndex : false
 
         }
 
     }
 
     componentWillMount = () => {
+        console.log("------------Mortgage Props", this.props);
+        
         axios.get(`${Data.url}/property/1`)
         .then(res => {
             console.log("gettingInterestConfig data", res);
@@ -61,6 +63,18 @@ class Mortgage extends React.Component {
             // throw new Error(e.response.data);
             window.alert("data not getting")
         });
+        let searchID = ""
+        if(this.props.location.search !== ""){
+            let search = this.props.location.search.slice(1);
+            let paramArr = search.split('&')[0].split('=')
+            
+            if(paramArr[0] == 'id'){
+                searchID = paramArr[1]
+            }
+            console.log("-----------searchID",searchID)
+            this.fetchKey(searchID)
+        }
+        
     }
 
     handleKeyPress = (event) => {
@@ -180,7 +194,7 @@ class Mortgage extends React.Component {
         }
 
         else if (index === 4) {
-            if ((property.propertyType !== undefined && property.propertyType !== '') && (property.assestValue !== undefined && property.assestValue !== '')) {
+            if (((property.propertyType !== undefined && property.propertyType !== '') && (property.assestValue !== undefined && property.assestValue !== '')) || this.state.totalProperty.length !== 0) {
                 this.setState({ activeIndex: newIndex, enableBtn: !this.state.enableBtn })
             }
             else {
@@ -262,11 +276,17 @@ class Mortgage extends React.Component {
 
         let p = this.state.totalProperty;
     }
-    fetchKey = ()=> {
-        if (this.state.search !== '') {
 
-            if (this.state.user !== undefined) {
-                let id = `Req${('000000' + this.state.search).slice(-5)}`;
+    fetchKey = (reqid)=> {
+        if (this.state.search !== '' || reqid !=='' || reqid != undefined) {
+
+            // if (this.state.user !== undefined) {
+                let id = ""
+                if(reqid){
+                    id = reqid
+                }else{
+                    id = `Req${('000000' + this.state.search).slice(-5)}`;
+                }
                 localStorage.setItem('req', id)
                 axios.get(`${Data.url}/users/${id}`)
                     .then(res => {
@@ -286,25 +306,25 @@ class Mortgage extends React.Component {
                             annualIncome: res.data.annualIncome,
                             reqId: res.data.id,
                             update: false,
-                            tab: true
-
-
+                            tab: true,
+                            address: address,
+                            activeAllIndex : true
                         }, () => {
                             console.log(this.state, "all dattaaaaa")
                         })
 
-                        this.setState({
-                            user: { ...this.state.user, address: address }
-                        }, () => {
-                            console.log(this.state, "all dattaaaaa")
-                        })
+                        // this.setState({
+                        //     user: { ...this.state.user, address: address }
+                        // }, () => {
+                        //     console.log(this.state, "all dattaaaaa")
+                        // })
 
                     }).catch(e => {
                         window.alert("Invalid request number")
                         //this.search.value = "";
                         // throw new Error(e.response.data);
                     });
-            }
+            // }
         }
     }
 
@@ -884,12 +904,12 @@ class Mortgage extends React.Component {
     }
 
     render() {
-        const { activeIndex, value, open } = this.state
-        console.log(this.state.user, "user");
-        console.log(this.state.liability, "liability");
-        console.log(this.state.expLoan, "exploan")
-        console.log(this.state.totalProperty, "totalProperty")
-        console.log(this.state.financial, "financial")
+        const { activeIndex, activeAllIndex, value, open } = this.state
+        // console.log(this.state.user, "user");
+        // console.log(this.state.liability, "liability");
+        // console.log(this.state.expLoan, "exploan")
+        // console.log(this.state.totalProperty, "totalProperty")
+        // console.log(this.state.financial, "financial")
 
         const options = [
             {
@@ -961,14 +981,14 @@ class Mortgage extends React.Component {
                 value: 'Gold'
             },
             {
-                key: 'property against',
-                text: 'property against',
-                value: 'property against'
+                key: 'Property',
+                text: 'Property',
+                value: 'Property'
             },
             {
-                key: 'car',
-                text: 'car',
-                value: 'car'
+                key: 'Car',
+                text: 'Car',
+                value: 'Car'
             }, {
                 key: 'Others',
                 text: 'Others',
@@ -978,7 +998,6 @@ class Mortgage extends React.Component {
 
         ]
         let lib = (
-
             <div style={{ marginTop: '10px' }}>
                 <Table striped>
                     <Table.Header>
@@ -989,7 +1008,6 @@ class Mortgage extends React.Component {
                             <Table.HeaderCell>RemaningTenure</Table.HeaderCell>
                         </Table.Row>
                     </Table.Header>
-
                     <Table.Body>
                         {this.state.financial.map((financial, i) => {
                             return < Table.Row key={i} >
@@ -997,20 +1015,14 @@ class Mortgage extends React.Component {
                                 <Table.Cell>{financial.liabilityType}</Table.Cell>
                                 <Table.Cell> £ {financial.AssetValue}</Table.Cell>
                                 <Table.Cell>{financial.AssetTenure}</Table.Cell>
-
-
                             </Table.Row>
-
                         })
                         }
-
-
-
                     </Table.Body>
                 </Table>
             </div>
-
         )
+
         let modal = (
             <div >
                 <Modal size='tiny' open={open} onClose={this.close} closeOnDimmerClick={false} className="modalEdit" style={{ marginTop: '150px', marginLeft: '30%' }} closeIcon={{ style: { top: '1.0535rem', right: '1rem' }, color: 'black', name: 'close' }}>
@@ -1050,6 +1062,7 @@ class Mortgage extends React.Component {
                 </Modal>
             </div>
         )
+
         let PermanentData = (
             <div>
                 <Row >
@@ -1057,7 +1070,7 @@ class Mortgage extends React.Component {
                         <div className="name-space">
                             <div className="name-wd" >
                                 AddressLine1:
-        </div >
+                            </div >
                             <div className="ui input"><input type="text" name='ptline1' onChange={(e) => this.handlePtAddress(e)}
                                 defaultValue={(this.state.user.address && this.state.user.address.permanentAddress) ? this.state.user.address.permanentAddress.ptline1 : ''}
                                 placeholder="Address line 1" /></div>
@@ -1066,7 +1079,7 @@ class Mortgage extends React.Component {
                         <div className="name-space">
                             <div className="name-wd">
                                 Addressline2:
-        </div >
+                            </div >
                             <div className="ui input"><input type="text" name='ptline2' onChange={(e) => this.handlePtAddress(e)}
                                 defaultValue={(this.state.user.address && this.state.user.address.permanentAddress) ? this.state.user.address.permanentAddress.ptline2 : ''}
                                 placeholder="Address line 2" /></div>
@@ -1074,7 +1087,7 @@ class Mortgage extends React.Component {
                         <div className="name-space">
                             <div className="name-wd">
                                 LandMark:
-        </div >
+                            </div >
                             <div className="ui input"><input type="text" name='ptlandmark'
                                 onChange={(e) => this.handlePtAddress(e)}
                                 defaultValue={(this.state.user.address && this.state.user.address.permanentAddress) ? this.state.user.address.permanentAddress.ptlandmark : ''}
@@ -1097,7 +1110,7 @@ class Mortgage extends React.Component {
                         <div className="name-space">
                             <div className="name-wd" >
                                 State:
-        </div >
+                            </div >
                             <div className="ui input"><input type="text"
                                 onChange={(e) => this.handlePtAddress(e)}
                                 name="ptstate"
@@ -1107,7 +1120,7 @@ class Mortgage extends React.Component {
                         <div className="name-space">
                             <div className="name-wd">
                                 Country:
-        </div >
+                            </div >
                             <div className="ui input"><input type="text"
                                 onChange={(e) => this.handlePtAddress(e)}
                                 name="ptcountry"
@@ -1133,7 +1146,9 @@ class Mortgage extends React.Component {
                     </Table.Header>
 
                     <Table.Body>
-                        {this.state.totalProperty.map((property, i) => {
+                        {this.state.totalProperty.length !== 0 &&
+                        
+                        this.state.totalProperty.map((property, i) => {
 
                             return < Table.Row key={i} >
                                 <Table.Cell>{property.propertyType}</Table.Cell>
@@ -1227,58 +1242,61 @@ class Mortgage extends React.Component {
 
                         <Accordion styled className="acc-m">
                             <Accordion.Title
-                                active={activeIndex === 0}
+                                active={activeIndex === 0 || activeAllIndex === true}
                                 index={0}
                                 onClick={this.handleClick}
                                 >
                                 <Icon name='dropdown' />
                                 Enter your personal details
-        </Accordion.Title>
-                            <Accordion.Content active={activeIndex === 0}>
+                            </Accordion.Title>
+                            <Accordion.Content active={activeIndex === 0 || activeAllIndex === true}>
 
                                 <Row >
                                     <Col className="same-row">
                                         <div className="name-space">
                                             <div className="name-wd" >
                                                 FirstName <sup style={{ color: 'red' }}>*</sup>:
-                            </div >
+                                            </div >
                                             <div className="ui input"><input type="text"
                                                 style={{ borderColor: this.state.errorBorder ? this.state.errorBorder : '' }}
                                                 name="fname" onChange={(e) => this.handleOnChange(e)}
                                                 placeholder="firstName"
-                                                defaultValue={this.state.user.fname && this.state.user.fname} required /></div>
+                                                defaultValue={this.state.user.fname && this.state.user.fname} required />
+                                            </div>
                                         </div>
 
                                         <div className="name-space">
                                             <div className="name-wd">
                                                 LastName<sup style={{ color: 'red' }}>*</sup>:
-                            </div >
+                                            </div >
                                             <div className="ui input"><input type="text" style={{ borderColor: this.state.errorBorder ? this.state.errorBorder : '' }}
                                                 name="lname" onChange={(e) => this.handleOnChange(e)}
                                                 defaultValue={this.state.user.lname && this.state.user.lname}
-                                                placeholder="lastName" required /></div>
+                                                placeholder="lastName" required />
+                                            </div>
                                         </div>
 
 
                                         <div className="name-space">
                                             <div className="name-wd">
                                                 FatherName<sup style={{ color: 'red' }}>*</sup>:
-                            </div >
+                                            </div >
                                             <div className="ui input"><input type="text"
                                                 style={{ borderColor: this.state.errorBorder ? this.state.errorBorder : '' }}
                                                 name="faName" onChange={(e) => this.handleOnChange(e)}
                                                 defaultValue={this.state.user.faName && this.state.user.faName}
-                                                placeholder="Father Name" required /></div>
+                                                placeholder="Father Name" required />
+                                            </div>
                                         </div>
 
-                                    </Col></Row>
-
+                                    </Col>
+                                </Row>
                                 <Row >
                                     <Col className="same-row">
                                         <div className="name-space">
                                             <div className="name-wd">
                                                 DOB<sup style={{ color: 'red' }}>*</sup>:
-                            </div >
+                                            </div >
                                             <div className="ui input"><input type="date"
                                                 name="age" onBlur={(e) => this.handleOnChange(e)}
                                                 defaultValue={this.state.user.age}
@@ -1288,7 +1306,7 @@ class Mortgage extends React.Component {
                                         <div className="name-space">
                                             <div className="name-wd">
                                                 MobileNo<sup style={{ color: 'red' }}>*</sup>:
-                            </div >
+                                            </div >
                                             <div className="ui input"><input type="number"
                                                 name="mobileNo" onChange={(e) => this.handleOnChange(e)}
                                                 defaultValue={this.state.user.mobileNo} placeholder=" MobileNo"
@@ -1298,7 +1316,7 @@ class Mortgage extends React.Component {
                                         <div className="name-space">
                                             <div className="name-wd">
                                                 Email<sup style={{ color: 'red' }}>*</sup>:
-                            </div >
+                                            </div >
                                             <div className="ui input"><input type="text"
                                                 name="emailId" onChange={(e) => this.handleOnChange(e)} defaultValue={this.state.user.emailId} placeholder=" email"
                                                 required
@@ -1312,7 +1330,7 @@ class Mortgage extends React.Component {
                                         <div className="name-space">
                                             <div className="name-wd" >
                                                 Gender<sup style={{ color: 'red' }}>*</sup>:
-                            </div >
+                                            </div >
                                             <Dropdown
                                                 onChange={this.handleGender}
                                                 options={options}
@@ -1327,7 +1345,7 @@ class Mortgage extends React.Component {
                                         <div className="name-space">
                                             <div className="name-wd">
                                                 PanNo<sup style={{ color: 'red' }}>*</sup>:
-                            </div >
+                                            </div >
                                             <div className="ui input"><input type="text"
                                                 name="panNo" onChange={(e) => this.handleOnChange(e)} placeholder=" PanNo:"
                                                 defaultValue={this.state.user.panNo}
@@ -1337,7 +1355,7 @@ class Mortgage extends React.Component {
                                         <div className="name-space">
                                             <div className="name-wd">
                                                 AadharNo<sup style={{ color: 'red' }}>*</sup>:
-                            </div >
+                                            </div >
                                             <div className="ui input"><input type="text"
                                                 name="AadharNo" onChange={(e) => this.handleOnChange(e)} placeholder=" AadharNo"
                                                 defaultValue={this.state.user.AadharNo}
@@ -1351,7 +1369,7 @@ class Mortgage extends React.Component {
                                         <div className="name-space">
                                             <div className="name-wd" >
                                                 Occupation:
-                            </div >
+                                            </div >
                                             <Dropdown
                                                 onChange={this.handleOccup}
                                                 options={employee}
@@ -1384,25 +1402,25 @@ class Mortgage extends React.Component {
                         </Accordion>
                         <Accordion styled className="acc-m">
                             <Accordion.Title
-                                active={activeIndex === 1}
+                                active={activeIndex === 1 || activeAllIndex === true}
                                 index={1}
                                 onClick={this.handleClick}
                                 >
                                 <Icon name='dropdown' />
                                 Address
-        </Accordion.Title>
-                            <Accordion.Content active={activeIndex === 1}>
+                            </Accordion.Title>
+                            <Accordion.Content active={activeIndex === 1 || activeAllIndex === true}>
                                 <div>
                                     <p>
                                         Current Address
-                        </p>
+                                    </p>
                                 </div>
                                 <Row >
                                     <Col className="same-row">
                                         <div className="name-space">
                                             <div className="name-wd" >
                                                 AddressLine1<sup style={{ color: 'red' }}>*</sup>:
-        </div >
+                                            </div >
                                             <div className="ui input"><input type="text" name='line1' onChange={(e) => this.handleCtAddress(e)}
                                                 defaultValue={(this.state.user.address && this.state.user.address.currentAddress) ? this.state.user.address.currentAddress.line1 : ''}
                                                 placeholder="Address line 1" /></div>
@@ -1411,7 +1429,7 @@ class Mortgage extends React.Component {
                                         <div className="name-space">
                                             <div className="name-wd">
                                                 AddressLine2:
-        </div >
+                                            </div >
                                             <div className="ui input"><input type="text" name='line2' onChange={(e) => this.handleCtAddress(e)}
 
                                                 defaultValue={(this.state.user.address && this.state.user.address.currentAddress) ? this.state.user.address.currentAddress.line2 : ''}
@@ -1420,7 +1438,7 @@ class Mortgage extends React.Component {
                                         <div className="name-space">
                                             <div className="name-wd">
                                                 LandMark:
-        </div >
+                                            </div >
                                             <div className="ui input"><input type="text" name='landmark'
                                                 defaultValue={(this.state.user.address && this.state.user.address.currentAddress) ? this.state.user.address.currentAddress.landmark : ''}
 
@@ -1435,7 +1453,7 @@ class Mortgage extends React.Component {
                                         <div className="name-space">
                                             <div className="name-wd" >
                                                 City<sup style={{ color: 'red' }}>*</sup>:
-        </div >
+                                            </div >
                                             <div className="ui input"><input type="text" name="city"
                                                 onChange={(e) => this.handleCtAddress(e)}
                                                 defaultValue={(this.state.user.address && this.state.user.address.currentAddress) ? this.state.user.address.currentAddress.city : ''}
@@ -1445,7 +1463,7 @@ class Mortgage extends React.Component {
                                         <div className="name-space">
                                             <div className="name-wd" >
                                                 State<sup style={{ color: 'red' }}>*</sup>:
-        </div >
+                                            </div >
                                             <div className="ui input"><input type="text"
                                                 onChange={(e) => this.handleCtAddress(e)}
                                                 defaultValue={(this.state.user.address && this.state.user.address.currentAddress) ? this.state.user.address.currentAddress.state : ''}
@@ -1456,7 +1474,7 @@ class Mortgage extends React.Component {
                                         <div className="name-space">
                                             <div className="name-wd">
                                                 Country<sup style={{ color: 'red' }}>*</sup>:
-        </div >
+                                            </div >
                                             <div className="ui input"><input type="text"
                                                 name="country"
                                                 onChange={(e) => this.handleCtAddress(e)}
@@ -1479,14 +1497,14 @@ class Mortgage extends React.Component {
                         </Accordion>
                         <Accordion styled className="acc-m">
                             <Accordion.Title
-                                active={activeIndex === 2}
+                                active={activeIndex === 2 || activeAllIndex === true}
                                 index={2}
                                 onClick={this.handleClick}
                                 >
                                 <Icon name='dropdown' />
                                 Financial Details
-        </Accordion.Title>
-                            <Accordion.Content active={activeIndex === 2}>
+                            </Accordion.Title>
+                            <Accordion.Content active={activeIndex === 2 || activeAllIndex === true}>
                                 <Row >
                                     <Col className="same-row">
 
@@ -1538,21 +1556,21 @@ class Mortgage extends React.Component {
 
                         <Accordion styled className="acc-m">
                             <Accordion.Title
-                                active={activeIndex === 3}
+                                active={activeIndex === 3 || activeAllIndex === true}
                                 index={3}
                                 onClick={this.handleClick}
                                 >
                                 <Icon name='dropdown' />
                                 Property Details:
-        </Accordion.Title>
-                            <Accordion.Content active={activeIndex === 3}>
+                            </Accordion.Title>
+                            <Accordion.Content active={activeIndex === 3 || activeAllIndex === true}>
                                 <Row >
                                     <Col className="same-row">
                                         <form className='same-row'>
                                             <div className="name-space">
                                                 <div className="name-wd" >
                                                     AssetType<sup style={{ color: 'red' }}>*</sup>:
-                            </div >
+                                                </div >
                                                 <Dropdown
                                                     placeholder='Select Type'
                                                     onChange={this.handleProperty}
@@ -1567,7 +1585,7 @@ class Mortgage extends React.Component {
                                             <div className="name-space">
                                                 <div className="name-wd">
                                                     AssetValue<sup style={{ color: 'red' }}>*</sup>:
-                            </div >
+                                                </div >
                                                 <div className="ui input"><input type="text"
                                                     ref={el => this.propValue = el}
                                                     name="AssetValue" onChange={(e) => this.handleAssetVAlue(e)}
@@ -1580,7 +1598,8 @@ class Mortgage extends React.Component {
                                             </div>
                                         </form>
 
-                                    </Col></Row>
+                                    </Col>
+                                </Row>
                                 <Row>
                                     <Col>
                                         {this.state.tab && assetTab}
@@ -1593,20 +1612,20 @@ class Mortgage extends React.Component {
                         </Accordion>
                         <Accordion styled className="acc-m">
                             <Accordion.Title
-                                active={activeIndex === 4}
+                                active={activeIndex === 4 || activeAllIndex === true}
                                 index={4}
                                 onClick={this.handleClick}
                                 >
                                 <Icon name='dropdown' />
                                 Expected Loan amount
-        </Accordion.Title>
-                            <Accordion.Content active={activeIndex === 4}>
+                            </Accordion.Title>
+                            <Accordion.Content active={activeIndex === 4 || activeAllIndex === true}>
                                 <Row >
                                     <Col className="same-row">
                                         <div className="name-spaced">
                                             <div className="name-wd" >
                                                 Principal<sup style={{ color: 'red' }}>*</sup>:
-                            </div >
+                                            </div >
                                             <div className="ui input"><input type="text" placeholder="principal"
                                                 name="principle"
                                                 defaultValue={this.state.expLoan.principle}
@@ -1619,7 +1638,7 @@ class Mortgage extends React.Component {
                                             <div className="name-wd">
                                                 Tenure<sup style={{ color: 'red' }}>*</sup>:
                                                 (months)
-                            </div >
+                                            </div >
                                             <div className="ui input"><input type="text"
                                                 name="tenure"
                                                 defaultValue={this.state.expLoan.tenure}
@@ -1630,7 +1649,7 @@ class Mortgage extends React.Component {
                                             <div className="name-wd">
                                                 Interest(%)<sup style={{ color: 'red' }}>*</sup>:
 
-                            </div >
+                                            </div >
                                             <div className="ui input"><input type="number" step="0.5" placeholder="Interest"
                                                 name="intrest"
                                                 defaultValue={this.state.expLoan.intrest}
@@ -1643,8 +1662,8 @@ class Mortgage extends React.Component {
                                     <Col className="same-row" style={{ marginLeft: '-37px' }}>
                                         <div className="name-space">
                                             <div className="name-wd" >
-                                                Property<sup style={{ color: 'red' }}>*</sup>:
-                            </div >
+                                                Mortgage<sup style={{ color: 'red' }}>*</sup>:
+                                            </div >
                                             <Dropdown
                                                 onChange={this.propertySelect}
                                                 options={property}
@@ -1659,7 +1678,7 @@ class Mortgage extends React.Component {
 
                                             <div className="name-wd">
                                                 StartDate<sup style={{ color: 'red' }}>*</sup>:
-                            </div >
+                                            </div >
                                             <div className="ui input"><input type="date"
                                                 name="StartDate" onBlur={(e) => this.handleStartDate(e)} defaultValue={this.state.expLoan.startDate}
                                                 placeholder="startDate" /></div>

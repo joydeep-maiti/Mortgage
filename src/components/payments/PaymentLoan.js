@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
+import { withRouter } from 'react-router-dom'
 import axios from 'axios'
-import { Icon, Dropdown, Table, Modal } from 'semantic-ui-react'
+import { Icon, Dropdown, Table, Modal, Button } from 'semantic-ui-react'
 import {Form, FormControl} from 'react-bootstrap'
 import { Data } from '../../config'
 import download from 'downloadjs';
@@ -12,7 +13,8 @@ class PaymentLoan extends React.Component {
       user: [],
       filteredApplication :[],
       open: false,
-      currentData: []
+      currentData: [],
+      approveApplication : null
     }
   }
 
@@ -94,32 +96,47 @@ class PaymentLoan extends React.Component {
 
       })
       .catch(e => {
-        throw new Error(e.response.data);
+        // throw new Error(e.response.data);
       });
-
-
-
-
     return res;
-
   }
+
   close = () => this.setState({ open: false })
+
   handleStatus = (value, i, user) => {
     // debugger
-    console.log(value, i, user)
-    let userUpdate = { ...this.state.user[i], status: value }
-    console.log(userUpdate, "uhiuhh")
-    this.setState({
-      status: value,
-      open: true,
-      currentData: { ...user }
-
-
-    }, () => console.log(this.state.status, "ttttt"))
-
-    this.componentWillReceiveProps(userUpdate)
-
+    console.log("----------------status change",value, i, user)
+    if(value === "Approved"){
+      this.setState({
+        open: true,
+        approveApplication : user
+      })
+    }
   }
+
+  approveApplication =()=> {
+    this.close();
+    let id = this.state.approveApplication.id
+    let body = this.state.approveApplication;
+    body.status = "Approved"
+    axios.patch(`${Data.url}/users/${id}`, body)
+      .then(res => {
+        console.log("----Apllication approved", res)
+        if(res.status === 200 ){
+          alert("Loan Application approved successfully");
+          this.componentWillMount();
+        }else{
+          alert("Something went wrong");
+        }
+      })
+      .catch(e => {
+        alert("Something went wrong");
+      });
+  }
+  redirectWithApplicationId = (id)=> {
+    this.props.history.push('/mortgage?id='+id);
+  }
+
   async download(reqId, fileName) {
     debugger
     const res = await fetch(`${Data.url}/download?reqid=${reqId}&fileName=${fileName}`);
@@ -139,37 +156,53 @@ class PaymentLoan extends React.Component {
       },
       {
         key: 'Approved',
+        text: 'Approve',
+        value: 'Approved'
+      }
+    ]
+    const status2 = [
+      {
+        key: 'Approved',
         text: 'Approved',
         value: 'Approved'
-      },
-      {
-        key: 'Other',
-        text: 'Other',
-        value: 'Other'
-      },
+      }
     ]
     let modal = (
       <div >
         <Modal size='tiny' open={open} onClose={this.close} closeOnDimmerClick={false} className="modalEdit" style={{ marginTop: '150px', marginLeft: '30%' }} closeIcon={{ style: { top: '1.0535rem', right: '1rem' }, color: 'black', name: 'close' }}>
-          <Modal.Header>are you sure want to Approve ?</Modal.Header>
+          <Modal.Header>Are you sure want to Approve ?</Modal.Header>
           <Modal.Content>
             <div className="name-space">
               <div className="name-wd" >
                 Intrest Rate :
               </div >
-            </div>
+              <div className="ui input">
+                <input type="text" name="interst" style={{marginLeft: '2px' }} value={this.state.approveApplication? this.state.approveApplication.expLoans.intrest+"%":""} disabled/></div>
+              </div>
             <div className="name-space">
               <div className="name-wd" >
                 Principal :
               </div >
+              <div className="ui input">
+                <input type="text" name="interst" style={{marginLeft: '2px' }} value={this.state.approveApplication? this.state.approveApplication.expLoans.principle:""} disabled/>
+              </div>
             </div>
             <div className="name-space">
               <div className="name-wd" >
                 Tenure:
               </div >
+              <div className="ui input">
+                <input type="text" name="interst" style={{marginLeft: '2px' }} value={this.state.approveApplication? this.state.approveApplication.expLoans.tenure+" Months":""} disabled/>
+              </div>
             </div>
           </Modal.Content>
           <Modal.Actions>
+            <Button inverted color='red' onClick={this.close}>
+              No
+            </Button>
+            <Button inverted color='green' onClick={this.approveApplication}>
+              Yes
+            </Button>
           </Modal.Actions>
         </Modal>
       </div>
@@ -206,7 +239,7 @@ class PaymentLoan extends React.Component {
             {this.state.filteredApplication && this.state.filteredApplication.map((user, i) => {
               return <Table.Row key={i} >
                 <Table.Cell>{i + 1}</Table.Cell>
-                <Table.Cell>{user.id}</Table.Cell>
+                <Table.Cell><a href="javascript:;" onClick={() => this.redirectWithApplicationId(user.id)}>{user.id}</a></Table.Cell>
                 <Table.Cell>{user.user.fname}</Table.Cell>
                 <Table.Cell>{user.expLoans.propertyType}</Table.Cell>
                 <Table.Cell>{user.expLoans.principle}</Table.Cell>
@@ -218,7 +251,7 @@ class PaymentLoan extends React.Component {
 
                   <Dropdown search key={i}
                     onChange={(e, data) => { this.handleStatus(data.value, i, user) } }
-                    options={status}
+                    options={user.status == 'Approved'?status2:status}
                     placeholder='select'
                     selection={true}
                     defaultValue={user.status ? user.status : ''}
@@ -259,4 +292,4 @@ class PaymentLoan extends React.Component {
 
 }
 
-export default PaymentLoan;
+export default withRouter(PaymentLoan);

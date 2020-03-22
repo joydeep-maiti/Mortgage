@@ -92,7 +92,7 @@ class App extends React.Component {
       routes = (
           <div>
             <Route exact path='/' render={() => <MyNavbar handleLogout={this.handleLogout}> <Landing /></MyNavbar>} />
-            <Route exact path='/mortgage' render={() => <MyNavbar handleLogout={this.handleLogout}> <Mortgage /></MyNavbar>} />
+            <Route path='/mortgage' render={() => <MyNavbar handleLogout={this.handleLogout}> <Mortgage /></MyNavbar>} />
             <Route exact path='/Preview' render={() => <MyNavbar handleLogout={this.handleLogout}> <Preview /></MyNavbar>} />
             <Route exact path='/paymentLoan' render={() => <MyNavbar handleLogout={this.handleLogout}> <PaymentLoan /></MyNavbar>} />
             <Route exact path='/paymentScheduler' render={() => <MyNavbar handleLogout={this.handleLogout}> <PaymentScheduler /></MyNavbar>} />
