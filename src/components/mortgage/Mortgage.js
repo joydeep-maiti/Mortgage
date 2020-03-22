@@ -373,7 +373,8 @@ class Mortgage extends React.Component {
                         console.log(outstandingBal, "iiiiii")
                     }
                     else {
-                        mon = mon + 1;
+                        mon = Number(mon) + 1;
+                        mon = mon < 10 ? '0'+mon : mon
                     }
                     row.month = day + '-' + mon + '-' + yr;
                     row.emi = emi;
@@ -390,7 +391,7 @@ class Mortgage extends React.Component {
                     console.log('EMI :', emi, 'INT:', Math.round(a), 'Prin:', (emi - a), (emi - Math.floor(a)), 'Balance:', outstandingBal);
                     if (mon >= 12) {
                         mon = 0;
-                        yr = yr + 1
+                        yr = Number(yr) + 1
                     }
                     emiScheduler.push(row);
                     j++;

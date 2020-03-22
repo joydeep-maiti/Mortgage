@@ -128,7 +128,7 @@ class PaymentScheduler extends React.Component {
             alert('Incorrect Data');
             return
         }
-        if(this.state.currentData.paymentType !== 'Cash' && (this.state.currentData.refNo == undefined || this.state.currentData.refNo == '')){
+        if(this.state.currentData.paymentType !== 'Cash' && (this.state.refNo == undefined || this.state.refNo == '')){
             alert('Enter Reference No');
             return
         }
@@ -515,10 +515,10 @@ class PaymentScheduler extends React.Component {
                         // })
                         let emiScheduler = [];
                         let date = res.data.expLoans.startDate.split('-');
-                        let day = Number(date[2]);
+                        let day = date[2];
                         let j = 0;
                         let outstandingBal = 0;
-                        let yr = Number(date[0]);
+                        let yr = date[0];
                         let mon = 0;
                         if (cal) {
                             for (var i = 0; i < tenure; i++) {
@@ -530,12 +530,13 @@ class PaymentScheduler extends React.Component {
                                     emi: ''
                                 }
                                 if (i === 0) {
-                                    mon = Number(date[1]);
+                                    mon = date[1];
                                     outstandingBal = cal
                                     console.log(outstandingBal, "iiiiii")
                                 }
                                 else {
-                                    mon = mon + 1;
+                                    mon = Number(mon) + 1;
+                                    mon = mon < 10 ? '0'+mon : mon
                                 }
                                 row.month = day + '-' + mon + '-' + yr;
                                 row.emi = emi;
@@ -552,7 +553,7 @@ class PaymentScheduler extends React.Component {
                                 console.log('EMI :', emi, 'INT:', Math.round(a), 'Prin:', (emi - a), (emi - Math.floor(a)), 'Balance:', outstandingBal);
                                 if (mon >= 12) {
                                     mon = 0;
-                                    yr = yr + 1
+                                    yr = Number(yr) + 1
                                 }
                                 emiScheduler.push(row);
                                 j++;
@@ -784,12 +785,20 @@ class PaymentScheduler extends React.Component {
                             {console.log(this.state.trimedData, "trimed data what")}
                             {
                                 this.state.trimedData && this.state.trimedData.map((data, i) => {
+                                    let cdate = new Date();
+                                    let thismonth = cdate.getMonth()+1;
+                                    thismonth = thismonth<10?"0"+thismonth:thismonth
+                                    let yr = cdate.getFullYear();
+                                    let thismon = thismonth+"-"+yr;
+                                    let date = data.month.slice(3);
+                                    let currentMonth = thismon===date?false:true
+                                    let disable = this.state.trimedData && this.state.trimedData[i].paymentMode !== undefined ? true : currentMonth
                                     return <Table.Row className={this.state.trimedData && this.state.trimedData[i].paymentMode !== undefined ? "tableSelected" : ""} key={i}
                                         style={{
                                             cursor: 'pointer',
                                             textDecoration: 'none'
                                         }} onClick={() => this.show(data, i)}
-                                        disabled={this.state.trimedData && this.state.trimedData[i].paymentMode !== undefined ? true : false} >
+                                        disabled={disable} >
                                         <Table.Cell>{i + 1}</Table.Cell>
 
                                         <Table.Cell >{data.month}</Table.Cell>
