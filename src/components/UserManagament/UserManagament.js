@@ -122,7 +122,11 @@ class UserManagament extends Component  {
         .then(res => {
             console.log("-----Delete User", res);
             if(res.status === 200){
-                this.componentWillMount();
+                this.setState({
+                    editDisable : {}
+                },
+                ()=> this.componentWillMount()
+                )
             }
         })
         .catch(e => {

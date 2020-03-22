@@ -945,20 +945,15 @@ class Mortgage extends React.Component {
 
         const AssetType = [
             {
-                key: 'Gold loan',
-                text: 'Gold loan',
-                value: 'Gold loan'
+                key: 'Gold',
+                text: 'Gold',
+                value: 'Gold'
             },
             {
-                key: 'property against',
-                text: 'property against',
-                value: 'property against'
+                key: 'Property',
+                text: 'Property',
+                value: 'Property'
             },
-            {
-                key: ' against',
-                text: 'property against',
-                value: 'property against'
-            }
 
 
         ]
