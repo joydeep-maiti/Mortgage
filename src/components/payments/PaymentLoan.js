@@ -32,7 +32,8 @@ class PaymentLoan extends React.Component {
         }
       })
       .catch(e => {
-        throw new Error(e.response.data);
+        // throw new Error(e.response.data);
+        alert("Oops! Something Wemt Wrong")
       });
   }
 
@@ -97,6 +98,7 @@ class PaymentLoan extends React.Component {
       })
       .catch(e => {
         // throw new Error(e.response.data);
+        alert("Oops! Something Wemt Wrong")
       });
     return res;
   }

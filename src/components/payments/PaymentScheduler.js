@@ -30,6 +30,7 @@ class PaymentScheduler extends React.Component {
             interest: '',
             open: false,
             currentData: [],
+            refNo:"",
             paid: false,
             indexValue: 0,
             paidEmi: 0,
@@ -123,6 +124,14 @@ class PaymentScheduler extends React.Component {
 
     }
     paymentDone = async () => {
+        if(this.state.currentData.paymentType == undefined || this.state.currentData.paymentType == '' ||this.state.currentData.ctDate == undefined || this.state.currentData.ctDate == '' || this.state.currentData.paidEmi == undefined || this.state.currentData.paidEmi == ''|| this.state.currentData.paidEmi < 1){
+            alert('Incorrect Data');
+            return
+        }
+        if(this.state.currentData.paymentType !== 'Cash' && (this.state.currentData.refNo == undefined || this.state.currentData.refNo == '')){
+            alert('Enter Reference No');
+            return
+        }
         const id = this.state.user.id;
         let property = [];
         let user = {}
@@ -130,26 +139,12 @@ class PaymentScheduler extends React.Component {
         let currentUser = this.state.user
         console.log(this.state.user, "user data current")
         let i = this.state.indexValue
-        // if (this.state.activePage === 2) {
-        //     i = i + 10;
-        //     this.setState({
-        //         indexValue: i
-        //     })
-        // }
-        // else {
-        //     let temp = Number((this.state.activePage - 1) + '0');
-        //     i = i + temp
-        //     this.setState({
-        //         indexValue: i
-        //     })
-        //     console.log(i)
-        // }
-
 
         if (this.state.user.emiScheduler == undefined) {
             console.log("helooo")
             property = this.state.user.totalEmi;
             property[i]["paymentMode"] = this.state.currentData.paymentType;
+            property[i]["paymentRefNo"] = this.state.refNo;
             property[i]["ctDate"] = this.state.currentData.ctDate;
             property[i]["paidEmi"] = this.state.currentData.paidEmi;
             let balEmi = this.state.emi - this.state.currentData.paidEmi
@@ -168,6 +163,7 @@ class PaymentScheduler extends React.Component {
             console.log("helooo1234")
             console.log(i, "current value of i")
             property[i]["paymentMode"] = this.state.currentData.paymentType;
+            property[i]["paymentRefNo"] = this.state.refNo;
             property[i]["ctDate"] = this.state.currentData.ctDate;
             property[i]["paidEmi"] = this.state.currentData.paidEmi;
             let balEmi = this.state.emi - this.state.currentData.paidEmi
@@ -611,19 +607,25 @@ class PaymentScheduler extends React.Component {
         })
     }
 
+    handleRefNo = (e) => {
+        this.setState({
+            refNo : e.target.value
+        })
+    }
+
 
     render() {
         const { open, activePage } = this.state;
         console.log("index value", this.state.indexValue)
         const payment = [
             {
-                key: 'cash',
-                text: 'cash',
+                key: 'Cash',
+                text: 'Cash',
                 value: 'cash'
             },
             {
-                key: 'cheque',
-                text: 'cheque',
+                key: 'Cheque',
+                text: 'Cheque',
                 value: 'cheque'
             },
             {
@@ -637,9 +639,28 @@ class PaymentScheduler extends React.Component {
                 value: 'IMPS'
             },
         ]
+
+        let ref = this.state.currentData?this.state.currentData.paymentType === 'IMPS'||this.state.currentData.paymentType === 'NFFT'||this.state.currentData.paymentType === 'cheque'?
+                    (
+                    <div style={{width:"323px", marginLeft:'auto'}}>   
+                        <div className="name-wd" style={{width:"100px", display:"inline-block"}}>
+                            Reference No.<sup style={{ color: 'red' }}>*</sup>:
+                        </div >
+                        <div className="ui input">
+                            <input type="text"
+                                // ref={el => this.propValue = el}
+                                name="refno" 
+                                onChange={(e) => this.handleRefNo(e)}
+                                value = {this.state.refNo}
+                                // defaultValue={}
+                            />
+                        </div>
+                    </div>)
+                    :"":""
+
         let modal = (
             <div>
-                <Modal size='large' open={open} onClose={this.close} closeOnDimmerClick={false} className="modalEdit" style={{ marginTop: '150px', marginLeft: '10%' }} closeIcon={{ style: { top: '1.0535rem', right: '1rem' }, color: 'black', name: 'close' }}>
+                <Modal size='large' open={open} onClose={this.close} closeOnDimmerClick={false} className="modalEdit" style={{ marginTop: '150px', marginLeft: '10%', overflow:"visible" }} closeIcon={{ style: { top: '1.0535rem', right: '1rem' }, color: 'black', name: 'close' }}>
                     <Modal.Header>Payment details</Modal.Header>
                     <Modal.Content>
                         <Table striped>
@@ -666,14 +687,16 @@ class PaymentScheduler extends React.Component {
 
 
                                     <Table.Cell>
-                                        <input type="date"
-                                            name="Date" onChange={(e) => this.handleOnChange(e)}
-                                            placeholder="Payment Date"
-                                            min={this.state.currentDate}
-                                            defaultValue={this.state.currentData.ctDate} />
-
+                                        <div className="ui input">
+                                            <input type="date"
+                                                name="Date" onChange={(e) => this.handleOnChange(e)}
+                                                placeholder="Payment Date"
+                                                min={this.state.currentDate}
+                                                defaultValue={this.state.currentData.ctDate} />
+                                        </div>
                                     </Table.Cell>
                                     <Table.Cell>
+                                    <div className="ui input">
                                         <input type="number"
                                             name="paidAmt" onChange={(e) => this.handleOnChangeEmi(e)}
                                             placeholder="paid amount"
@@ -681,10 +704,11 @@ class PaymentScheduler extends React.Component {
                                                 ? (this.state.user.emiScheduler[this.state.indexValue - 1].unpaidPen ? this.state.user.emiScheduler[this.state.indexValue - 1].unpaidPen : 0) + this.state.currentData.paidEmi :
                                                 this.state.currentData.paidEmi) :
                                                 this.state.currentData.paidEmi} />
-
+                                    </div>
                                     </Table.Cell>
                                     <Table.Cell>
                                         <Dropdown
+                                        style={{overflow:"visible"}}
                                             onChange={this.paymentMode}
                                             options={payment}
                                             placeholder='select'
@@ -695,9 +719,10 @@ class PaymentScheduler extends React.Component {
                                 </Table.Row>
                             </Table.Body>
                         </Table>
+                        { ref }
                     </Modal.Content>
                     <Modal.Actions>
-                        <Button onClick={() => this.paymentDone()} style={{ marginRight: '230px', width: '120px', color: "white", backgroundColor: 'green' }}>Done</Button>
+                        <Button onClick={() => this.paymentDone()} style={{ marginRight: '30px', width: '120px', color: "white", backgroundColor: 'green' }}>Done</Button>
 
                     </Modal.Actions>
                 </Modal>
@@ -731,10 +756,10 @@ class PaymentScheduler extends React.Component {
                                     <Button style={{ float: 'right', marginBottom: '10px',color:"white", backgroundColor: 'green', borderColor: 'green' }} onClick={() => { this.exportToCSV() } }>Download As excel </Button>
                                     <Button style={{ float: 'right', marginBottom: '10px',color:"white", backgroundColor: 'green', borderColor: 'green' }} onClick={() => { this.exportPDF("ALL") } }>Download As PDF </Button>
                             </p>
-                            <p style={{ marginTop : "28px"}}>
+                            {/* <p style={{ marginTop : "28px"}}>
                                 <Button style={{ float: 'right', marginBottom: '10px', color:"white", backgroundColor: 'green', borderColor: 'green' }} onClick={() => { this.exportPDF("UNPAId") } }>Download Unpaid Emi report </Button>
                                 <Button style={{ float: 'right', marginBottom: '10px', color:"white", backgroundColor: 'green', borderColor: 'green' }} onClick={() => { this.exportPDF("PAID") } }>Download Paid Emi report </Button>
-                            </p>
+                            </p> */}
                             </div>
 
                         }

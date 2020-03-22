@@ -1153,7 +1153,7 @@ class Mortgage extends React.Component {
                             return < Table.Row key={i} >
                                 <Table.Cell>{property.propertyType}</Table.Cell>
                                 <Table.Cell> {property.assestValue}</Table.Cell>
-                                <Table.Cell>
+                                <Table.Cell disabled={this.state.status === "Approved"?true:false}>
                                     <div >MorgagedDoc : <a href="javascript:;" onClick={() => this.download(this.state.reqId, (property.file1 ? property.file1.name : ''))}>{property.file1 ? property.file1.name : ' '} </a>
                                         {property.file1 && <Icon size="small" inverted name='delete' className="searchIcon" color='black' link onClick={() => this.deleteFile(i, { file1: undefined })} />}</div>
                                     <div >AadhaarCard : <a href="javascript:;" onClick={() => this.download(this.state.reqId, (property.file2 ? property.file2.name : ''))}>{property.file2 ? property.file2.name : ' '}</a>
@@ -1184,6 +1184,7 @@ class Mortgage extends React.Component {
                         selection
                         options={LibType}
                         defaultValue={this.state.liability.liabilityType}
+                        disabled={this.state.status === "Approved"?true:false}
                         />
                 </div>
 
@@ -1197,7 +1198,7 @@ class Mortgage extends React.Component {
                         name="AssetValue"
                         onChange={(e) => this.handleOnLiability(e)}
                         defaultValue={this.state.liability.AssetValue}
-                        placeholder=" RemainingValue" /></div>
+                        placeholder=" RemainingValue" disabled={this.state.status === "Approved"?true:false}/></div>
                 </div>
                 <div className="name-space">
                     <div className="name-wd" style={{ marginTop: '-1px' }}>
@@ -1210,12 +1211,12 @@ class Mortgage extends React.Component {
                         ref={el => this.inputTenure = el}
                         onChange={(e) => this.handleOnLiability(e)}
                         defaultValue={this.state.liability.AssetTenure}
-                        placeholder=" RemainingValue" /></div>
+                        placeholder=" RemainingValue" disabled={this.state.status === "Approved"?true:false}/></div>
 
 
                 </div>
 
-                <Icon name='add circle' className="ml-auto" style={{ marginTop: '15px' }} size="large" onClick={this.addLiability} />
+                <Icon name='add circle' className="ml-auto" style={{ marginTop: '15px' }} size="large" onClick={this.addLiability} disabled={this.state.status === "Approved"?true:false}/>
 
             </div>
         )
@@ -1261,7 +1262,8 @@ class Mortgage extends React.Component {
                                                 style={{ borderColor: this.state.errorBorder ? this.state.errorBorder : '' }}
                                                 name="fname" onChange={(e) => this.handleOnChange(e)}
                                                 placeholder="firstName"
-                                                defaultValue={this.state.user.fname && this.state.user.fname} required />
+                                                defaultValue={this.state.user.fname && this.state.user.fname} required 
+                                                disabled={this.state.status === "Approved"?true:false}/>
                                             </div>
                                         </div>
 
@@ -1272,7 +1274,7 @@ class Mortgage extends React.Component {
                                             <div className="ui input"><input type="text" style={{ borderColor: this.state.errorBorder ? this.state.errorBorder : '' }}
                                                 name="lname" onChange={(e) => this.handleOnChange(e)}
                                                 defaultValue={this.state.user.lname && this.state.user.lname}
-                                                placeholder="lastName" required />
+                                                placeholder="lastName" required disabled={this.state.status === "Approved"?true:false}/>
                                             </div>
                                         </div>
 
@@ -1285,7 +1287,7 @@ class Mortgage extends React.Component {
                                                 style={{ borderColor: this.state.errorBorder ? this.state.errorBorder : '' }}
                                                 name="faName" onChange={(e) => this.handleOnChange(e)}
                                                 defaultValue={this.state.user.faName && this.state.user.faName}
-                                                placeholder="Father Name" required />
+                                                placeholder="Father Name" required disabled={this.state.status === "Approved"?true:false}/>
                                             </div>
                                         </div>
 
@@ -1301,7 +1303,7 @@ class Mortgage extends React.Component {
                                                 name="age" onBlur={(e) => this.handleOnChange(e)}
                                                 defaultValue={this.state.user.age}
                                                 style={{ borderColor: this.state.errorBorder ? this.state.errorBorder : '' }}
-                                                placeholder="age" required /></div>
+                                                placeholder="age" required disabled={this.state.status === "Approved"?true:false}/></div>
                                         </div>
                                         <div className="name-space">
                                             <div className="name-wd">
@@ -1310,7 +1312,7 @@ class Mortgage extends React.Component {
                                             <div className="ui input"><input type="number"
                                                 name="mobileNo" onChange={(e) => this.handleOnChange(e)}
                                                 defaultValue={this.state.user.mobileNo} placeholder=" MobileNo"
-                                                required
+                                                required disabled={this.state.status === "Approved"?true:false}
                                                 /></div>
                                         </div>
                                         <div className="name-space">
@@ -1319,7 +1321,7 @@ class Mortgage extends React.Component {
                                             </div >
                                             <div className="ui input"><input type="text"
                                                 name="emailId" onChange={(e) => this.handleOnChange(e)} defaultValue={this.state.user.emailId} placeholder=" email"
-                                                required
+                                                required disabled={this.state.status === "Approved"?true:false}
                                                 /></div>
                                         </div>
                                     </Col>
@@ -1339,6 +1341,7 @@ class Mortgage extends React.Component {
                                                 defaultValue={value}
                                                 value={this.state.user.gender}
                                                 required
+                                                disabled={this.state.status === "Approved"?true:false}
                                                 />
 
                                         </div>
@@ -1349,7 +1352,7 @@ class Mortgage extends React.Component {
                                             <div className="ui input"><input type="text"
                                                 name="panNo" onChange={(e) => this.handleOnChange(e)} placeholder=" PanNo:"
                                                 defaultValue={this.state.user.panNo}
-                                                required
+                                                required disabled={this.state.status === "Approved"?true:false}
                                                 /></div>
                                         </div>
                                         <div className="name-space">
@@ -1359,7 +1362,7 @@ class Mortgage extends React.Component {
                                             <div className="ui input"><input type="text"
                                                 name="AadharNo" onChange={(e) => this.handleOnChange(e)} placeholder=" AadharNo"
                                                 defaultValue={this.state.user.AadharNo}
-                                                required
+                                                required disabled={this.state.status === "Approved"?true:false}
                                                 /></div>
                                         </div>
                                     </Col>
@@ -1378,6 +1381,7 @@ class Mortgage extends React.Component {
                                                 defaultValue={value}
                                                 value={this.state.user.occupation}
                                                 required
+                                                disabled={this.state.status === "Approved"?true:false}
                                                 />
 
                                         </div>
@@ -1388,7 +1392,7 @@ class Mortgage extends React.Component {
                                             <div className="ui input" ><input type="text"
                                                 name="company" onChange={(e) => this.handleOnChange(e)} placeholder=" company"
                                                 defaultValue={this.state.user.company}
-                                                required
+                                                required disabled={this.state.status === "Approved"?true:false}
                                                 />
                                             </div>
                                         </div>
@@ -1423,7 +1427,7 @@ class Mortgage extends React.Component {
                                             </div >
                                             <div className="ui input"><input type="text" name='line1' onChange={(e) => this.handleCtAddress(e)}
                                                 defaultValue={(this.state.user.address && this.state.user.address.currentAddress) ? this.state.user.address.currentAddress.line1 : ''}
-                                                placeholder="Address line 1" /></div>
+                                                placeholder="Address line 1" disabled={this.state.status === "Approved"?true:false}/></div>
                                         </div>
 
                                         <div className="name-space">
@@ -1433,7 +1437,7 @@ class Mortgage extends React.Component {
                                             <div className="ui input"><input type="text" name='line2' onChange={(e) => this.handleCtAddress(e)}
 
                                                 defaultValue={(this.state.user.address && this.state.user.address.currentAddress) ? this.state.user.address.currentAddress.line2 : ''}
-                                                placeholder="Address line 2" /></div>
+                                                placeholder="Address line 2" disabled={this.state.status === "Approved"?true:false}/></div>
                                         </div>
                                         <div className="name-space">
                                             <div className="name-wd">
@@ -1443,7 +1447,7 @@ class Mortgage extends React.Component {
                                                 defaultValue={(this.state.user.address && this.state.user.address.currentAddress) ? this.state.user.address.currentAddress.landmark : ''}
 
                                                 onChange={(e) => this.handleCtAddress(e)}
-                                                placeholder="LandMark" /></div>
+                                                placeholder="LandMark" disabled={this.state.status === "Approved"?true:false}/></div>
                                         </div>
                                     </Col></Row>
 
@@ -1458,7 +1462,7 @@ class Mortgage extends React.Component {
                                                 onChange={(e) => this.handleCtAddress(e)}
                                                 defaultValue={(this.state.user.address && this.state.user.address.currentAddress) ? this.state.user.address.currentAddress.city : ''}
                                                 // value={this.state.user.Address.city}
-                                                placeholder="City" /></div>
+                                                placeholder="City" disabled={this.state.status === "Approved"?true:false}/></div>
                                         </div>
                                         <div className="name-space">
                                             <div className="name-wd" >
@@ -1469,7 +1473,7 @@ class Mortgage extends React.Component {
                                                 defaultValue={(this.state.user.address && this.state.user.address.currentAddress) ? this.state.user.address.currentAddress.state : ''}
                                                 // value={this.state.user.Address.state}
                                                 name="state"
-                                                placeholder="State" /></div>
+                                                placeholder="State" disabled={this.state.status === "Approved"?true:false}/></div>
                                         </div>
                                         <div className="name-space">
                                             <div className="name-wd">
@@ -1479,12 +1483,12 @@ class Mortgage extends React.Component {
                                                 name="country"
                                                 onChange={(e) => this.handleCtAddress(e)}
                                                 defaultValue={(this.state.user.address && this.state.user.address.currentAddress) ? this.state.user.address.currentAddress.country : ''}
-                                                placeholder=" Country" /></div>
+                                                placeholder=" Country" disabled={this.state.status === "Approved"?true:false}/></div>
                                         </div>
                                     </Col>
                                 </Row>
                                 <div className="ui checkbox top-align" >
-                                    <input type="checkbox" tabIndex="0" value={this.state.sameAddr} onChange={() => this.handleCheckBox()} />
+                                    <input type="checkbox" tabIndex="0" value={this.state.sameAddr} onChange={() => this.handleCheckBox()} disabled={this.state.status === "Approved"?true:false}/>
                                     <label>Permanent address is as same as current address</label>
                                 </div>
 
@@ -1514,7 +1518,7 @@ class Mortgage extends React.Component {
                                          </div >
                                             <div className="ui input"><input type="text" placeholder="Annual Income"
                                                 defaultValue={this.state.annualIncome}
-                                                onChange={(e) => this.handleIncome(e)} /></div>
+                                                onChange={(e) => this.handleIncome(e)} disabled={this.state.status === "Approved"?true:false}/></div>
                                         </div>
 
 
@@ -1523,7 +1527,7 @@ class Mortgage extends React.Component {
                                     <Col>
                                         <div style={{ display: 'flex' }}>
                                             <div className="ui checkbox top-align" >
-                                                <input type="checkbox" tabIndex="0" value={this.state.ifLiability} onChange={() => this.handleLiability()} />
+                                                <input type="checkbox" tabIndex="0" value={this.state.ifLiability} onChange={() => this.handleLiability()} disabled={this.state.status === "Approved"?true:false}/>
                                                 <label>If any Liabilities:</label>
                                             </div>
                                             <div style={{ marginTop: '-5px' }}>
@@ -1535,7 +1539,7 @@ class Mortgage extends React.Component {
                                                         onChange={(e) => this.handleOnLiability(e)}
                                                         ref={el => this.inputBank = el}
                                                         defaultValue={this.state.liability.bankName}
-                                                        placeholder="Bank Name" /></div>
+                                                        placeholder="Bank Name" disabled={this.state.status === "Approved"?true:false}/></div>
                                                 </div>}
                                             </div>
                                         </div>
@@ -1578,7 +1582,7 @@ class Mortgage extends React.Component {
                                                     options={AssetType}
                                                     defaultValue={value}
                                                     value={this.state.totalProperty ? this.state.property.propertyType : ''}
-
+                                                    disabled={this.state.status === "Approved"?true:false}
                                                     />
                                             </div>
 
@@ -1590,10 +1594,10 @@ class Mortgage extends React.Component {
                                                     ref={el => this.propValue = el}
                                                     name="AssetValue" onChange={(e) => this.handleAssetVAlue(e)}
                                                     defaultValue={value}
-                                                    placeholder=" asset value" /></div>
+                                                    placeholder=" asset value" disabled={this.state.status === "Approved"?true:false}/></div>
                                             </div>
                                             <div>
-                                                <Button className="ml-auto" style={{ backgroundColor: 'green', borderColor: 'green', marginRight: '100px', marginTop: '10px' }} onClick={() => this.show()}>Upload Document</Button>
+                                                <Button className="ml-auto" style={{ backgroundColor: 'green', borderColor: 'green', marginRight: '100px', marginTop: '10px' }} onClick={() => this.show()} disabled={this.state.status === "Approved"?true:false}>Upload Document</Button>
                                                 {modal}
                                             </div>
                                         </form>
@@ -1630,7 +1634,7 @@ class Mortgage extends React.Component {
                                                 name="principle"
                                                 defaultValue={this.state.expLoan.principle}
                                                 onChange={(e) => { this.handleLoan(e) } }
-                                                /></div>
+                                                disabled={this.state.status === "Approved"?true:false}/></div>
 
                                         </div>
 
@@ -1643,7 +1647,7 @@ class Mortgage extends React.Component {
                                                 name="tenure"
                                                 defaultValue={this.state.expLoan.tenure}
                                                 onChange={(e) => { this.handleLoan(e) } }
-                                                placeholder="Tenure" /></div>
+                                                placeholder="Tenure" disabled={this.state.status === "Approved"?true:false}/></div>
                                         </div>
                                         <div className="name-spaced">
                                             <div className="name-wd">
@@ -1653,7 +1657,7 @@ class Mortgage extends React.Component {
                                             <div className="ui input"><input type="number" step="0.5" placeholder="Interest"
                                                 name="intrest"
                                                 defaultValue={this.state.expLoan.intrest}
-                                                onChange={(e) => { this.handleLoan(e) } } /></div>
+                                                onChange={(e) => { this.handleLoan(e) } } disabled={this.state.status === "Approved"?true:false}/></div>
                                         </div>
 
 
@@ -1671,6 +1675,7 @@ class Mortgage extends React.Component {
                                                 selection={true}
                                                 defaultValue={value}
                                                 value={this.state.expLoan.propertyType}
+                                                disabled={this.state.status === "Approved"?true:false}
                                                 />
                                         </div>
                                         <div className="name-space">
@@ -1681,7 +1686,7 @@ class Mortgage extends React.Component {
                                             </div >
                                             <div className="ui input"><input type="date"
                                                 name="StartDate" onBlur={(e) => this.handleStartDate(e)} defaultValue={this.state.expLoan.startDate}
-                                                placeholder="startDate" /></div>
+                                                placeholder="startDate" disabled={this.state.status === "Approved"?true:false}/></div>
                                         </div>
                                         <div className="name-space" >
                                             <Radio
