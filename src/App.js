@@ -12,6 +12,7 @@ import PaymentScheduler from './components/payments/PaymentScheduler'
 import { history } from "../src/components/helpers/history"
 import Config from './components/Config/Config'
 import SignIn from './components/Login/SignIn'
+import UserManagament from './components/UserManagament/UserManagament'
 import axios from 'axios'
 import { Data } from './config'
 
@@ -97,6 +98,7 @@ class App extends React.Component {
             <Route exact path='/paymentLoan' render={() => <MyNavbar handleLogout={this.handleLogout}> <PaymentLoan /></MyNavbar>} />
             <Route exact path='/paymentScheduler' render={() => <MyNavbar handleLogout={this.handleLogout}> <PaymentScheduler /></MyNavbar>} />
             <Route exact path='/config' render={() => <MyNavbar handleLogout={this.handleLogout}> <Config /></MyNavbar>} />
+            <Route exact path='/usermanagement' render={() => <MyNavbar handleLogout={this.handleLogout}> <UserManagament /></MyNavbar>} />
           </div>
       )
     }

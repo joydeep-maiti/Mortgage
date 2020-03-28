@@ -1,7 +1,8 @@
 import React, { Component} from 'react'
 import './style.css'
 import { Icon,Dropdown } from 'semantic-ui-react'
-import { Button} from 'react-bootstrap'
+import { Paper } from '@material-ui/core'
+import { Button, Row, Col} from 'react-bootstrap'
 import axios from 'axios'
 import { Data } from '../../config'
 import Usertable from './UsersTable'
@@ -139,7 +140,9 @@ class UserManagament extends Component  {
     render(){
         const stateOptions = this.state.roles
         return(
-            <div>
+            <Row style={{ marginTop: '20px' }} >
+                <Col className="col-first" style={{ margin: "5px 34px" }} >
+            <Paper className='mortgage-banner-front paper-info' zDepth={2} style={{ marginRight: '0px', padding: '20px', width: '100%', height: "fit-content", marginBottom: '10px' }}>
                 <h2 style={{textAlign:"center"}}>User Managament</h2>
                 <br/>
                 <h4 style={{marginLeft:"50px"}}>Add User</h4>
@@ -169,7 +172,9 @@ class UserManagament extends Component  {
                 <br/><br/>
                 <Usertable userArray={this.state.userArray} editDisable={this.state.editDisable} handleRoleEdit={(i)=>this.handleRoleEdit(i)} handleRoleUpdate={(i,userId,userData)=>this.handleRoleUpdate(i,userId,userData)} handleUserDelete={(userId)=>this.handleUserDelete(userId)}/>
                 
-            </div>
+            </Paper>
+            </Col>
+            </Row>
         )
     }
 }

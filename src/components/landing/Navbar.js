@@ -17,7 +17,16 @@ import jsPDF from 'jspdf';
 import "jspdf-autotable";
 import Logo from '../../logo.jpg'
 
-
+const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+let cdate = new Date();
+let nxtmonth = cdate.getMonth()+1;
+let yearNo = cdate.getFullYear();
+if(nxtmonth === 12){
+    nxtmonth = 0;
+    yearNo += 1;
+}
+let nxtmonthName = months[nxtmonth];
+let nextMonthWithYear = nxtmonthName+"-"+yearNo;
 let totalEmiPaid = 0;
 
 export default class MyNavbar extends React.Component {
@@ -164,6 +173,9 @@ export default class MyNavbar extends React.Component {
         let applicationsStatusArray = []
         let nextMonthDataArray = []
         const self = this;
+
+        
+        
         switch(condition){
             case "ALL": title = "Payment Scheduler";
             applicationsEmiJsonArray = self.getAllEmiData();
@@ -177,7 +189,7 @@ export default class MyNavbar extends React.Component {
             case "STATUS": title = "Status Report";
             applicationsStatusArray = self.getStatusReportData();
                         break;
-            case "NEXT": title = "Next Month Data";
+            case "NEXT": title = nextMonthWithYear+" Outstanding Data";
             nextMonthDataArray = self.getnextMonthData();
                         break;
         }
@@ -267,9 +279,9 @@ export default class MyNavbar extends React.Component {
                 margin: marginLeft
             };
             doc.setFontSize(20);
-            doc.text(title, 235, 100);
+            doc.text(title, 200, 100);
             doc.autoTable(content);
-            doc.save("Next Month Data.pdf")
+            doc.save(nextMonthWithYear+" Outstanding Data.pdf")
         }
     }
 
@@ -480,8 +492,13 @@ export default class MyNavbar extends React.Component {
             emidatas.map((el,j)=> {
                 let cdate = new Date();
                 let nxtmonth = cdate.getMonth()+2;
-                nxtmonth = nxtmonth<10?"0"+nxtmonth:nxtmonth
                 let yr = cdate.getFullYear();
+                if(nxtmonth === 13){
+                    nxtmonth = 1;
+                    yr += 1;
+                }
+                nxtmonth = nxtmonth<10?"0"+nxtmonth:nxtmonth
+                
                 let nxtmon = nxtmonth+"-"+yr;
                 let date = el.month.slice(3);
                 // console.log("-----------------checking for",date, nxtmon)
@@ -551,12 +568,13 @@ export default class MyNavbar extends React.Component {
     };
    
     render() {
+        
         const stateOptions = [
-            { key: "1", text: "Paid Emi", value: 1},
-            { key: "2", text: "Unpaid Emi", value: 2},
+            { key: "1", text: "Paid EMI", value: 1},
+            { key: "2", text: "Unpaid EMI", value: 2},
+            { key: "3", text: "All EMI", value: 3},
             { key: "4", text: "Status Report", value: 4},
-            { key: "5", text: "Next Month Data", value: 5},
-            { key: "3", text: "All", value: 3},
+            { key: "5", text: nextMonthWithYear+" Outstanding Data", value: 5}
         ]
 
         const open = Boolean(this.state.anchorEl);
@@ -583,6 +601,9 @@ export default class MyNavbar extends React.Component {
                         </Nav.Item>
                         <Nav.Item>
                             <Nav.Link href='/config'>Config</Nav.Link>
+                        </Nav.Item>
+                        <Nav.Item>
+                            <Nav.Link href='/usermanagement'>User Managament</Nav.Link>
                         </Nav.Item>
                     </Nav>
                     <Navbar.Collapse id="basic-navbar-nav" className="left-spacing"  >

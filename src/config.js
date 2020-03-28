@@ -14,14 +14,14 @@ const dev = {
 };
 
 const prod = {
-    // url: "https://json-server-mortgage.herokuapp.com"
-    url: "https://mortgagejsonserver.herokuapp.com"
+    url: "https://json-server-mortgage.herokuapp.com"
+    // url: "https://mortgagejsonserver.herokuapp.com"
 };
 
-const Data = prod;
-// const Data = process.env.REACT_APP_STAGE === 'production'
-//     ? prod
-//     : dev;
+// const Data = prod;
+const Data = process.env.REACT_APP_STAGE === 'production'
+    ? prod
+    : dev;
 
 const interestRate = {
     Gold: '11',

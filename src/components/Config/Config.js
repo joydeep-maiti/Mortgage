@@ -14,15 +14,9 @@ class Config extends React.Component {
             car: 9,
             propertyAgainst : 10.5,
             other: 11,
-            id: 3
-        },
-        penalty: {
-            gold: 8.5,
-            car: 9,
-            propertyAgainst : 10.5,
-            other: 11,
-            id: 3
-        },
+            penalty: 7.7,
+            id: 1
+        }
     } 
 
     handleSubmit = () => {
@@ -33,7 +27,7 @@ class Config extends React.Component {
     componentWillMount = () => {
         axios.get(`${Data.url}/property/1`)
         .then(res => {
-            console.log("submitInterestConfig data", res);
+            console.log("getInterestConfig data", res);
             this.setState({
                 property: res.data
             })
@@ -41,19 +35,7 @@ class Config extends React.Component {
         })
         .catch(e => {
             // throw new Error(e.response.data);
-            window.alert("data not getting")
-        });
-        axios.get(`${Data.url}/penalty/1`)
-        .then(res => {
-            console.log("submitInterestConfig data", res);
-            this.setState({
-                penalty: res.data
-            })
-
-        })
-        .catch(e => {
-            // throw new Error(e.response.data);
-            window.alert("data not getting")
+            window.alert("Couldn't fetch data ")
         });
     }
 
@@ -63,20 +45,6 @@ class Config extends React.Component {
             console.log("submitInterestConfig data", res);
             if(res.status === 200) {
                 alert("Interest Rate submitted Successfully");
-            }
-        })
-        .catch(e => {
-            // throw new Error(e.response.data);
-            window.alert("data not getting")
-        });
-    }
-
-    submitPenaltyConfig = () => {
-        axios.put(`${Data.url}/penalty/1`,this.state.penalty)
-        .then(res => {
-            console.log("submitpenaltyConfig data", res);
-            if(res.status === 200) {
-                alert("Penalty Rate submitted Successfully");
             }
         })
         .catch(e => {
@@ -97,6 +65,8 @@ class Config extends React.Component {
                             break;
             case 'OTHER': property.other = e.target.value;
                             break;
+            case 'PENALTY': property.penalty = e.target.value;
+                            break;
         }
 
         this.setState({
@@ -104,24 +74,6 @@ class Config extends React.Component {
         })
     }
 
-    onChangeHandler2 = (e,prop) => {
-        let penalty =  this.state.penalty
-        
-        switch(prop){
-            case 'GOLD': penalty.gold = e.target.value;
-                            break;
-            case 'CAR': penalty.car = e.target.value;
-                            break;
-            case 'PROPERTY AGAINST': penalty.propertyAgainst = e.target.value;
-                            break;
-            case 'OTHER': penalty.other = e.target.value;
-                            break;
-        }
-
-        this.setState({
-            penalty
-        })
-    }
 
 
     render() {
@@ -133,9 +85,9 @@ class Config extends React.Component {
             <div>
             <Row style={{ marginTop: '20px' }} >
                 <Col className="col-first" style={{ margin: "5px 34px" }} >
-                    <Paper className='mortgage-banner-front paper-info' zDepth={2} style={{ marginRight: '0px', padding: '20px', width: '100%', height: "fit-content", marginBottom: '10px' }}>
+                    <Paper className='mortgage-banner-front paper-info' zDepth={2} style={{ marginRight: '0px', padding: '20px', width: '100%', height: "200px", marginBottom: '10px' }}>
                     <h2 style={{textAlign:"center"}}>Interest Rate</h2>
-                        <Row >
+                        <Row style={{marginTop:'45px'}}>
                             
                                 <div className="configInput">
                                     <div className="configLevel" >
@@ -163,7 +115,14 @@ class Config extends React.Component {
                                         <input type="text" name="" placeholder="Interest" required value={this.state.property.propertyAgainst} onChange={(e)=>this.onChangeHandler(e,'PROPERTY AGAINST')}/>
                                     </div>
                                 </div>
-                            
+                                <div className="configInput">
+                                    <div className="configLevel">
+                                    Penalty <sup style={{ color: 'red' }}>*</sup>:
+                                    </div >
+                                    <div className="ui input myinputDiv">
+                                        <input type="text" name="" placeholder="Interest" required value={this.state.property.penalty} onChange={(e)=>this.onChangeHandler(e,'PENALTY')}/>
+                                    </div>
+                                </div>
                                 <div className="configInput">
                                     <div className="configLevel">
                                     Others <sup style={{ color: 'red' }}>*</sup>:
@@ -180,7 +139,7 @@ class Config extends React.Component {
                     </Paper>
                 </Col>
             </Row>
-            <Row style={{ marginTop: '20px' }} >
+            {/* <Row style={{ marginTop: '20px' }} >
                 <Col className="col-first" style={{ margin: "5px 34px" }} >
                     <Paper className='mortgage-banner-front paper-info' zDepth={2} style={{ marginRight: '0px', padding: '20px', width: '100%', height: "fit-content", marginBottom: '10px' }}>
                     <h2 style={{textAlign:"center"}}>Penalty Rate</h2>
@@ -228,14 +187,7 @@ class Config extends React.Component {
                         </Row>
                     </Paper>
                 </Col>
-            </Row>
-            <Row style={{ marginTop: '20px' }} >
-                <Col className="col-first" style={{ margin: "5px 34px" }} >
-                    <Paper className='mortgage-banner-front paper-info' zDepth={2} style={{ marginRight: '0px', padding: '20px', width: '100%', height: "fit-content", marginBottom: '10px' }}>
-                        <UserManagament/>
-                    </Paper>
-                </Col>
-            </Row>
+            </Row> */}
             </div>
         )
     }
