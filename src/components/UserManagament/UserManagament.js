@@ -71,17 +71,30 @@ class UserManagament extends Component  {
             userrole : this.state.roles[this.state.userrole-1].text 
         }
         const self = this;
-        axios.post(`${Data.url}/user`, userdata)
+        axios.get(`${Data.url}/user?username=${userdata.username}`)
         .then(res => {
             console.log("push User", res);
-            if(res.status === 201){
-                this.componentWillMount();
+            if(res.status === 200 && res.data.length == 1){
+                alert("User already exists")
+            }else if(res.status === 200 && res.data.length == 0){
+                axios.post(`${Data.url}/user`, userdata)
+                .then(res => {
+                    console.log("push User", res);
+                    if(res.status === 201){
+                        this.componentWillMount();
+                    }
+                })
+                .catch(e => {
+                    // throw new Error(e.response.data);
+                    window.alert("data not getting")
+                });
             }
         })
         .catch(e => {
             // throw new Error(e.response.data);
             window.alert("data not getting")
         });
+        
     }
 
     handleRoleEdit = (i) => {
