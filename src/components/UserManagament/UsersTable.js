@@ -1,6 +1,8 @@
 import React from 'react';
 import { Icon, Dropdown, Table, Modal } from 'semantic-ui-react'
 
+import './table.css'
+
 const usersTable = (props)=> {
     console.log("-----PROPS", props.editDisable);
     const users = props.userArray;
@@ -56,6 +58,7 @@ const usersTable = (props)=> {
                 <Table.Cell width={250}>{user.username}</Table.Cell>
                 <Table.Cell width={280}>
                   <Dropdown search key={i}
+                    style={{lineHeight:"1.3rem", padding:"2px 5px", minHeight: 0}}
                     onChange={(e, data) => handleRoleChange(user,data)}
                     options={roles}
                     placeholder= "Role"

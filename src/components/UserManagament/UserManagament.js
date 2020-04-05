@@ -157,7 +157,7 @@ class UserManagament extends Component  {
                 <Col className="col-first" style={{ margin: "5px 34px" }} >
             <Paper className='mortgage-banner-front paper-info' zDepth={2} style={{ marginRight: '0px', padding: '20px', width: '100%', height: "fit-content", marginBottom: '10px' }}>
                 <h2 style={{textAlign:"center"}}>User Managament</h2>
-                <br/>
+                {/* <br/> */}
                 <h4 style={{marginLeft:"50px"}}>Add User</h4>
                 <br/>
 

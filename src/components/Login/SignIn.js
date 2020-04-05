@@ -44,7 +44,7 @@ export default function SignIn(props) {
 
     const [state, setState] = React.useState({
         checked : true,
-        username : "",
+        username : "Admin",
         password : ""
     });
     

@@ -226,9 +226,9 @@ class PaymentLoan extends React.Component {
       <div className="head-m" style={{ backgroundColor: '#f5f6fa', paddingBottom: '45px', marginTop: '0px' }}>
         {/* <div style={{textAlign:"center"}}> */}
           <h2 style={{textAlign:"center", padding:"20px"}}>Loan Applications</h2>
-          <Form inline  style={{ float: 'right', marginRight:"20px", marginBottom:"20px"}}>
+          <Form inline  style={{ width: '270px', marginRight:"auto", marginLeft:"auto"}}>
                 Search:
-                  <FormControl type="text" placeholder="Request Number...." className="mr-sm-2" ref={el => this.search = el} style={{ marginLeft: '20px'}}
+                  <FormControl type="text" placeholder="Application Number/ Name / Ph. No." className="mr-sm-2" ref={el => this.search = el} style={{ marginLeft: '20px'}}
                   onChange={(e) => this.searchKey(e)} value={this.state.search} onKeyPress={this.handleKeyPress} />
               {/* <Icon size="large" inverted name='search' className="searchIcon" color='black' link onClick={() => this.fetchKey()} /> */}
           </Form>
