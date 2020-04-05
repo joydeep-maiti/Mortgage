@@ -189,7 +189,7 @@ export default class MyNavbar extends React.Component {
             case "STATUS": title = "Status Report";
             applicationsStatusArray = self.getStatusReportData();
                         break;
-            case "NEXT": title = nextMonthWithYear+" Outstanding Data";
+            case "NEXT": title = nextMonthWithYear+" Collection Data";
             nextMonthDataArray = self.getnextMonthData();
                         break;
         }
@@ -226,6 +226,7 @@ export default class MyNavbar extends React.Component {
                 if(flag == 0){
                     flag = 1;
                 }
+                doc.addImage(Logo, 'JPG', 450, 20, 100, 80);
                 doc.setFontSize(20);
                 doc.text(title, 200, 100);
                 doc.setFontSize(15);
@@ -281,7 +282,7 @@ export default class MyNavbar extends React.Component {
             doc.setFontSize(20);
             doc.text(title, 200, 100);
             doc.autoTable(content);
-            doc.save(nextMonthWithYear+" Outstanding Data.pdf")
+            doc.save(nextMonthWithYear+" Collection Data.pdf")
         }
     }
 
@@ -574,7 +575,7 @@ export default class MyNavbar extends React.Component {
             { key: "2", text: "Unpaid EMI", value: 2},
             { key: "3", text: "All EMI", value: 3},
             { key: "4", text: "Status Report", value: 4},
-            { key: "5", text: nextMonthWithYear+" Outstanding Data", value: 5}
+            { key: "5", text: "Next Month Collection Data", value: 5}
         ]
 
         const open = Boolean(this.state.anchorEl);
