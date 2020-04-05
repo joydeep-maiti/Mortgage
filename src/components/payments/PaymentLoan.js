@@ -69,10 +69,23 @@ class PaymentLoan extends React.Component {
 
         if (this.state.user !== undefined) {
             let id = `Req${('000000' + this.state.search).slice(-5)}`;
+            let searchParam = this.state.search
             let filteredApplication = []
             this.state.user.map((el, i)=> {
               console.log("-------App",el,el.id)
-              if(el.id === id){
+              if(el.id.toLocaleLowerCase().includes(searchParam.toLocaleLowerCase())){
+                filteredApplication.push(el);
+              }
+              if(el.user.fname.toLocaleLowerCase().includes(searchParam.toLocaleLowerCase())){
+                filteredApplication.push(el);
+              }
+              if(el.user.lname.toLocaleLowerCase().includes(searchParam.toLocaleLowerCase())){
+                filteredApplication.push(el);
+              }
+              if((el.user.fname+" "+el.user.lname).toLocaleLowerCase().includes(searchParam.toLocaleLowerCase())){
+                filteredApplication.push(el);
+              }
+              if(el.user.mobileNo.toLocaleLowerCase().includes(searchParam.toLocaleLowerCase())){
                 filteredApplication.push(el);
               }
             })

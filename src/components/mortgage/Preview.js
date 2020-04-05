@@ -10,24 +10,27 @@ import { Data } from '../../config'
     class Preview extends React.Component{
         constructor(props){
             super();
-this.state={
-    user:{}
-}
+            this.state={
+                user:{
+                    expLoans: {
+                        principle: "",
+                        tenure: "",
+                        intrest: "",
+                      },
+                }
+            }
         }
 
 
         async componentWillMount() {
             let id =localStorage.getItem("ReqId");
-            console.log(this.state.reqId,"khjkhj.kdjhskdhcskhcskdhjkk")
+            console.log('Request ID',this.state.reqId)
                 const res = await axios.get(`${Data.url}/users/${id}`, )
                     .then(res => {
-                        console.log(res.data, "datakdhjskdjhsdjkhsdhjk")
+                        console.log("",res.data)
                         this.setState({
                             user:res.data
                         },()=>console.log(this.state.user,"-------------------"))
-         
-                       
-        
                     })
                     .catch(e => {
                         throw new Error(e.response.data);
@@ -54,12 +57,16 @@ this.state={
                                     <div className="my-financials-first" style={{ marginTop: "1%" }}>
                                         <p className="my-financials-paragraph">Your reference number is <span style={{ color: "black", fontWeight: "bold", fontSize: "20px", paddingLeft: "1%" }}>{this.state.user.id}</span></p>
                                         <p className="my-financials-bold">It looks like we could help</p>
-                                        <p className="my-financials-paragraph" style={{ marginTop: "0px" }}>Based on the selected Asset for Collateral, you could borrow upto <span style={{ paddingLeft: "1%" }} className="my-financials-eligible"> 65000</span></p>
+                                        {/* <p className="my-financials-paragraph" style={{ marginTop: "0px" }}>Based on the selected Asset for Collateral, you could borrow upto <span style={{ paddingLeft: "1%" }} className="my-financials-eligible"> 65000</span></p> */}
                                         {/* <p className="my-financials-eligible" ></p> */}
                                         <div>
+                                            <p className="my-financials-paragraph" style={{ marginTop: "10px" }}> Your application for loan with Pricipal Amount<span style={{ fontSize: "25px", color: "black", paddingLeft: "1%" }}>{this.state.user.expLoans.principle + " "}</span> for tenure of<span style={{ fontSize: "20px", color: "black", paddingLeft: "1%" }}>{this.state.user.expLoans.tenure + " Months"}</span> has been submitted Successfully</p>
+                                            {/* <p className="my-financials-paragraph">This Agreement in Principle is based on a maximum term of <span style={{ color: "black" }}>10 years</span></p> */}
+                                        </div>
+                                        {/* <div>
                                             <p className="my-financials-paragraph" style={{ marginTop: "10px" }}> Based on the total Asset, you could borrow up to <span style={{ fontSize: "25px", color: "black", paddingLeft: "1%" }}>85000</span></p>
                                             <p className="my-financials-paragraph">This Agreement in Principle is based on a maximum term of <span style={{ color: "black" }}>10 years</span></p>
-                                        </div>
+                                        </div> */}
         
                                     </div>
                                     <div className="my-financials-second">
