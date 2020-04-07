@@ -16,11 +16,23 @@ class Config extends React.Component {
             other: 11,
             penalty: 7.7,
             id: 1
-        }
+        },
+        validation: {
+            gold: true,
+            car: true,
+            propertyAgainst : true,
+            other: true,
+            penalty: true,
+        },
+        validationError: false
+
     } 
 
     handleSubmit = () => {
-        // submit data
+        if(this.state.validationError){
+            alert("Fix all the error before submitting");
+            return;
+        }
         this.submitInterestConfig();
     }
 
@@ -55,22 +67,56 @@ class Config extends React.Component {
 
     onChangeHandler = (e,prop) => {
         let property =  this.state.property
-        
+        let regex =/^\s*(?=.*[1-9])\d{1,2}(?:\.\d{1,2})?\s*$/ 
+        let validation = this.state.validation
+        let validationError = false;
+
         switch(prop){
             case 'GOLD': property.gold = e.target.value;
+            if(!regex.test(e.target.value)){
+                validation['gold'] = false
+                validationError = true;
+            }else{
+                validation['gold'] = true
+            }
                             break;
             case 'CAR': property.car = e.target.value;
+            if(!regex.test(e.target.value)){
+                validation['car'] = false
+                validationError = true;
+            }else{
+                validation['car'] = true
+            }
                             break;
             case 'PROPERTY AGAINST': property.propertyAgainst = e.target.value;
+            if(!regex.test(e.target.value)){
+                validation['propertyAgainst'] = false
+                validationError = true;
+            }else{
+                validation['propertyAgainst'] = true
+            }
                             break;
             case 'OTHER': property.other = e.target.value;
+            if(!regex.test(e.target.value)){
+                validation['other'] = false
+                validationError = true;
+            }else{
+                validation['other'] = true
+            }
                             break;
             case 'PENALTY': property.penalty = e.target.value;
+            if(!regex.test(e.target.value)){
+                validation['penalty'] = false
+                validationError = true;
+            }else{
+                validation['penalty'] = true
+            }
                             break;
         }
 
         this.setState({
-            property
+            property,
+            validationError
         })
     }
 
@@ -94,7 +140,9 @@ class Config extends React.Component {
                                         Gold <sup style={{ color: 'red' }}>*</sup>:
                                     </div >
                                     <div className="ui input myinputDiv">
-                                        <input type="text" name="lname" placeholder="Interest" required value={this.state.property.gold} onChange={(e)=>this.onChangeHandler(e,'GOLD')}/>
+                                        <input type="text" name="lname" 
+                                        style={{ borderColor: this.state.validation.gold!=undefined?this.state.validation.gold === false ? 'red' : '' :''}}
+                                        placeholder="Interest" required value={this.state.property.gold} onChange={(e)=>this.onChangeHandler(e,'GOLD')}/>
                                     </div>
                                 </div>
                             
@@ -103,7 +151,9 @@ class Config extends React.Component {
                                         Car <sup style={{ color: 'red' }}>*</sup>:
                                     </div>
                                     <div className="ui input myinputDiv" >
-                                        <input type="text" name="" placeholder="Interest" required value={this.state.property.car} onChange={(e)=>this.onChangeHandler(e,'CAR')}/>
+                                        <input type="text" name=""
+                                        style={{ borderColor: this.state.validation.car!=undefined?this.state.validation.car === false ? 'red' : '' :''}} 
+                                        placeholder="Interest" required value={this.state.property.car} onChange={(e)=>this.onChangeHandler(e,'CAR')}/>
                                     </div>
                                 </div>
                             
@@ -112,7 +162,9 @@ class Config extends React.Component {
                                     Property <sup style={{ color: 'red' }}>*</sup>:
                                     </div >
                                     <div className="ui input myinputDiv">
-                                        <input type="text" name="" placeholder="Interest" required value={this.state.property.propertyAgainst} onChange={(e)=>this.onChangeHandler(e,'PROPERTY AGAINST')}/>
+                                        <input type="text" name="" 
+                                        style={{ borderColor: this.state.validation.propertyAgainst!=undefined?this.state.validation.propertyAgainst === false ? 'red' : '' :''}}
+                                        placeholder="Interest" required value={this.state.property.propertyAgainst} onChange={(e)=>this.onChangeHandler(e,'PROPERTY AGAINST')}/>
                                     </div>
                                 </div>
                                 <div className="configInput">
@@ -120,7 +172,9 @@ class Config extends React.Component {
                                     Penalty <sup style={{ color: 'red' }}>*</sup>:
                                     </div >
                                     <div className="ui input myinputDiv">
-                                        <input type="text" name="" placeholder="Interest" required value={this.state.property.penalty} onChange={(e)=>this.onChangeHandler(e,'PENALTY')}/>
+                                        <input type="text" name="" 
+                                        style={{ borderColor: this.state.validation.penalty!=undefined?this.state.validation.penalty === false ? 'red' : '' :''}}
+                                        placeholder="Interest" required value={this.state.property.penalty} onChange={(e)=>this.onChangeHandler(e,'PENALTY')}/>
                                     </div>
                                 </div>
                                 <div className="configInput">
@@ -128,7 +182,9 @@ class Config extends React.Component {
                                     Others <sup style={{ color: 'red' }}>*</sup>:
                                     </div >
                                     <div className="ui input myinputDiv">
-                                        <input type="text" name="" placeholder="Interest" required value={this.state.property.other} onChange={(e)=>this.onChangeHandler(e,'OTHER')}/>
+                                        <input type="text" name="" 
+                                        style={{ borderColor: this.state.validation.fname!=undefined?this.state.validation.fname === false ? 'red' : '' :''}}
+                                        placeholder="Interest" required value={this.state.property.other} onChange={(e)=>this.onChangeHandler(e,'OTHER')}/>
                                     </div>
                                 </div>
                                 <div style={{marginTop:'auto'}}>

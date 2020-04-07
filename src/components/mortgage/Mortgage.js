@@ -9,6 +9,7 @@ import { Data } from '../../config'
 import download from 'downloadjs';
 
 
+
 class Mortgage extends React.Component {
     constructor(props) {
         super(props);
@@ -43,38 +44,8 @@ class Mortgage extends React.Component {
             update: true,
             propertyRate:null,
             activeAllIndex : false,
-            validation : {
-                fname : true,
-                lname : true,
-                faname : true,
-                mobileNo : true,
-                emailId : true,
-                gender : true,
-                panNo : true,
-                AadharNo : true,
-                occupation : true,
-                company : true,
-                currentAddressline1 : true,
-                currentAddressline2 : true,
-                currentAddresslandmark : true,
-                currentAddressCity : true,
-                currentAddressstate : true,
-                currentAddresscountry : true,
-                permanentAddressline1 : true,
-                permanentAddressline2 : true,
-                permanentAddresslandmark : true,
-                permanentAddressCity : true,
-                permanentAddressstate : true,
-                permanentAddresscountry : true,
-                annualIncome : true,
-                bankName : true,
-                liabilityAssetValue : true,
-                liabilityAssetTenure : true,
-                assetValue : true,
-                principle : true,
-                tenure : true,
-                intrest : true
-            }
+            validation : {},
+            validationError : false
 
         }
 
@@ -132,8 +103,10 @@ class Mortgage extends React.Component {
         let value = e.target.value;
         let numberonlyreg = /^[0-9]{1,20}$/
         let assetvalue
+        let validationError = false;
             if(!numberonlyreg.test(value)){
                 assetvalue = false
+                validationError = true;
             }else {
                 assetvalue = true
             }
@@ -142,7 +115,8 @@ class Mortgage extends React.Component {
             validation : {
                 ...this.state.validation,
                 assetValue : assetvalue
-            }
+            },
+            validationError
         })
     }
     show = () => {
@@ -292,52 +266,60 @@ class Mortgage extends React.Component {
         let emailreg = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/
         let panreg = /^([a-zA-Z]){5}([0-9]){4}([a-zA-Z]){1}?$/
         let aadharreg = /^\d{12}$/
-
+        let validationError = false;
         switch(e.target.name){
             case 'fname': if(!nameregex.test(e.target.value)){
                 validation[e.target.name] = false
+                validationError = true;
             }else{
                 validation[e.target.name] = true
             }
                 break;
             case 'lname':if(!nameregex.test(e.target.value)){
                 validation[e.target.name] = false
+                validationError = true;
             }else{
                 validation[e.target.name] = true
             }
                 break;
             case 'faName':if(!nameregex.test(e.target.value)){
                 validation[e.target.name] = false
+                validationError = true;
             }else{
                 validation[e.target.name] = true
             }
                 break;
             case 'mobileNo':if(!mobexp.test(e.target.value)){
                 validation[e.target.name] = false
+                validationError = true;
             }else{
                 validation[e.target.name] = true
             }
                 break;
             case 'emailId':if(!emailreg.test(e.target.value)){
                 validation[e.target.name] = false
+                validationError = true;
             }else{
                 validation[e.target.name] = true
             }
                 break;
             case 'panNo':if(!panreg.test(e.target.value)){
                 validation[e.target.name] = false
+                validationError = true;
             }else{
                 validation[e.target.name] = true
             }
                 break;
             case 'AadharNo':if(!aadharreg.test(e.target.value)){
                 validation[e.target.name] = false
+                validationError = true;
             }else{
                 validation[e.target.name] = true
             }
                 break;
             case 'company':if(!nameregex.test(e.target.value)){
                 validation[e.target.name] = false
+                validationError = true;
             }else{
                 validation[e.target.name] = true
             }
@@ -348,7 +330,8 @@ class Mortgage extends React.Component {
             validation : {
                 ...this.state.validation,
                 ...validation
-            }
+            },
+            validationError
         })
     }
     handleStartDate(e) {
@@ -433,7 +416,10 @@ class Mortgage extends React.Component {
 
 
     async handleProceed(reqID) {
-
+        if(this.state.validationError){
+            alert("Fix all the error before submitting");
+            return;
+        }
         // debugger;
         const { financial, user, expLoan, totalProperty, annualIncome, radio, status } = this.state;
         if ((expLoan.principle !== undefined && expLoan.principle !== '') && (expLoan.tenure !== undefined && expLoan.tenure !== '')
@@ -852,30 +838,34 @@ class Mortgage extends React.Component {
         let addr = { ...this.state.address.currentAddress };
         console.log('Address : ', addr);
         addr[e.target.name] = e.target.value;
-
+        let validationError = false;
         console.log('Address2 : ', addr)
         let nameregex = /^[a-zA-Z ]{1,30}$/
         switch(e.target.name){
             case 'landmark':if(!nameregex.test(e.target.value)){
                 addr[e.target.name] = false
+                validationError = true;
             }else{
                 addr[e.target.name] = true
             }
                 break;
             case 'city':if(!nameregex.test(e.target.value)){
                 addr[e.target.name] = false
+                validationError = true;
             }else{
                 addr[e.target.name] = true
             }
                 break;
             case 'state':if(!nameregex.test(e.target.value)){
                 addr[e.target.name] = false
+                validationError = true;
             }else{
                 addr[e.target.name] = true
             }
                 break;
             case 'country':if(!nameregex.test(e.target.value)){
                 addr[e.target.name] = false
+                validationError = true;
             }else{
                 addr[e.target.name] = true
             }
@@ -889,7 +879,8 @@ class Mortgage extends React.Component {
             validation : {
                 ...this.state.validation,
                 currentAddress : addr
-            }
+            },
+            validationError
 
         }, console.log('---', this.state.address, ">>>>>>>>", this.state.user))
     }
@@ -897,29 +888,33 @@ class Mortgage extends React.Component {
 
         let addr = { ...this.state.address.permanentAddress };
         addr[e.target.name] = e.target.value;
-
+        let validationError = false;
         let nameregex = /^[a-zA-Z ]{1,30}$/
         switch(e.target.name){
             case 'ptlandmark':if(!nameregex.test(e.target.value)){
                 addr[e.target.name] = false
+                validationError = true;
             }else{
                 addr[e.target.name] = true
             }
                 break;
             case 'ptcity':if(!nameregex.test(e.target.value)){
                 addr[e.target.name] = false
+                validationError = true;
             }else{
                 addr[e.target.name] = true
             }
                 break;
             case 'ptstate':if(!nameregex.test(e.target.value)){
                 addr[e.target.name] = false
+                validationError = true;
             }else{
                 addr[e.target.name] = true
             }
                 break;
             case 'ptcountry':if(!nameregex.test(e.target.value)){
                 addr[e.target.name] = false
+                validationError = true;
             }else{
                 addr[e.target.name] = true
             }
@@ -932,7 +927,8 @@ class Mortgage extends React.Component {
             validation : {
                 ...this.state.validation,
                 permanentAddress : addr
-            }
+            },
+            validationError
 
         }, console.log('---', this.state.address, ">>>>>>>>", this.state.user))
 
@@ -942,8 +938,10 @@ class Mortgage extends React.Component {
     handleIncome = (e) => {
         let numberonlyreg = /^[0-9]{1,20}$/
         let income
+        let validationError = false;
         if(!numberonlyreg.test(e.target.value)){
             income = false
+            validationError = true;
         }else{
             income = true
         }
@@ -952,7 +950,8 @@ class Mortgage extends React.Component {
             validation : {
                 ...this.state.validation,
                 annualIncome : income
-            }
+            },
+            validationError
         })
         console.log("annual", this.state.annualIncome)
     }
@@ -966,6 +965,7 @@ class Mortgage extends React.Component {
 
     }
     handleOnLiability = (e) => {
+        let validationError = false;
         console.log("........", e.target.value)
         let liability = { ...this.state.liability };
         console.log(liability, "///////////jjjjjj")
@@ -975,18 +975,21 @@ class Mortgage extends React.Component {
         switch(e.target.name) {
             case 'bankName':if(!nameregex.test(e.target.value)){
                 liability[e.target.name] = false
+                validationError = true;
             }else{
                 liability[e.target.name] = true
             }
                 break; 
             case 'AssetValue':if(!numberonlyreg.test(e.target.value)){
                 liability[e.target.name] = false
+                validationError = true;
             }else{
                 liability[e.target.name] = true
             }
                 break; 
             case 'AssetTenure':if(!numberonlyreg.test(e.target.value)){
                 liability[e.target.name] = false
+                validationError = true;
             }else{
                 liability[e.target.name] = true
             }
@@ -997,7 +1000,8 @@ class Mortgage extends React.Component {
             validation : {
                 ...this.state.validation,
                 liability
-            }
+            },
+            validationError
             //  user: { ...this.state.user, ...this.state.liability}
         })
 
@@ -1040,19 +1044,21 @@ class Mortgage extends React.Component {
     }
 
     handleLoan = (e) => {
-
+        let validationError = false;
         let expLoan = this.state.expLoan
         expLoan[e.target.name] = e.target.value;
         let numberonlyreg = /^[0-9]{1,20}$/
         switch(e.target.name) {
             case 'principle':if(!numberonlyreg.test(e.target.value)){
                 expLoan[e.target.name] = false
+                validationError = true;
             }else{
                 expLoan[e.target.name] = true
             }
                 break; 
             case 'tenure':if(!numberonlyreg.test(e.target.value)){
                 expLoan[e.target.name] = false
+                validationError = true;
             }else{
                 expLoan[e.target.name] = true
             }
@@ -1063,7 +1069,8 @@ class Mortgage extends React.Component {
             validation : {
                 ...this.state.validation,
                 expLoan
-            }
+            },
+            validationError
         })
         console.log(",.,.,.,.,.,.,.", this.state.expLoan)
     }
