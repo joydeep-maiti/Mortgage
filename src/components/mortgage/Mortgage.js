@@ -42,7 +42,39 @@ class Mortgage extends React.Component {
             errorBorder: '',
             update: true,
             propertyRate:null,
-            activeAllIndex : false
+            activeAllIndex : false,
+            validation : {
+                fname : true,
+                lname : true,
+                faname : true,
+                mobileNo : true,
+                emailId : true,
+                gender : true,
+                panNo : true,
+                AadharNo : true,
+                occupation : true,
+                company : true,
+                currentAddressline1 : true,
+                currentAddressline2 : true,
+                currentAddresslandmark : true,
+                currentAddressCity : true,
+                currentAddressstate : true,
+                currentAddresscountry : true,
+                permanentAddressline1 : true,
+                permanentAddressline2 : true,
+                permanentAddresslandmark : true,
+                permanentAddressCity : true,
+                permanentAddressstate : true,
+                permanentAddresscountry : true,
+                annualIncome : true,
+                bankName : true,
+                liabilityAssetValue : true,
+                liabilityAssetTenure : true,
+                assetValue : true,
+                principle : true,
+                tenure : true,
+                intrest : true
+            }
 
         }
 
@@ -98,8 +130,19 @@ class Mortgage extends React.Component {
 
     handleAssetVAlue = (e) => {
         let value = e.target.value;
+        let numberonlyreg = /^[0-9]{1,20}$/
+        let assetvalue
+            if(!numberonlyreg.test(value)){
+                assetvalue = false
+            }else {
+                assetvalue = true
+            }
         this.setState({
-            property: { ...this.state.property, assestValue: value }
+            property: { ...this.state.property, assestValue: value },
+            validation : {
+                ...this.state.validation,
+                assetValue : assetvalue
+            }
         })
     }
     show = () => {
@@ -243,9 +286,69 @@ class Mortgage extends React.Component {
         // debugger
         let user = this.state.user;
         user[e.target.name] = e.target.value
+        let validation = this.state.validation
+        let nameregex = /^[a-zA-Z ]{1,30}$/
+        let mobexp = /^[0-9]{10}$/
+        let emailreg = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/
+        let panreg = /^([a-zA-Z]){5}([0-9]){4}([a-zA-Z]){1}?$/
+        let aadharreg = /^\d{12}$/
+
+        switch(e.target.name){
+            case 'fname': if(!nameregex.test(e.target.value)){
+                validation[e.target.name] = false
+            }else{
+                validation[e.target.name] = true
+            }
+                break;
+            case 'lname':if(!nameregex.test(e.target.value)){
+                validation[e.target.name] = false
+            }else{
+                validation[e.target.name] = true
+            }
+                break;
+            case 'faName':if(!nameregex.test(e.target.value)){
+                validation[e.target.name] = false
+            }else{
+                validation[e.target.name] = true
+            }
+                break;
+            case 'mobileNo':if(!mobexp.test(e.target.value)){
+                validation[e.target.name] = false
+            }else{
+                validation[e.target.name] = true
+            }
+                break;
+            case 'emailId':if(!emailreg.test(e.target.value)){
+                validation[e.target.name] = false
+            }else{
+                validation[e.target.name] = true
+            }
+                break;
+            case 'panNo':if(!panreg.test(e.target.value)){
+                validation[e.target.name] = false
+            }else{
+                validation[e.target.name] = true
+            }
+                break;
+            case 'AadharNo':if(!aadharreg.test(e.target.value)){
+                validation[e.target.name] = false
+            }else{
+                validation[e.target.name] = true
+            }
+                break;
+            case 'company':if(!nameregex.test(e.target.value)){
+                validation[e.target.name] = false
+            }else{
+                validation[e.target.name] = true
+            }
+                break;
+        }
         this.setState({
             user: user,
-
+            validation : {
+                ...this.state.validation,
+                ...validation
+            }
         })
     }
     handleStartDate(e) {
@@ -751,9 +854,42 @@ class Mortgage extends React.Component {
         addr[e.target.name] = e.target.value;
 
         console.log('Address2 : ', addr)
+        let nameregex = /^[a-zA-Z ]{1,30}$/
+        switch(e.target.name){
+            case 'landmark':if(!nameregex.test(e.target.value)){
+                addr[e.target.name] = false
+            }else{
+                addr[e.target.name] = true
+            }
+                break;
+            case 'city':if(!nameregex.test(e.target.value)){
+                addr[e.target.name] = false
+            }else{
+                addr[e.target.name] = true
+            }
+                break;
+            case 'state':if(!nameregex.test(e.target.value)){
+                addr[e.target.name] = false
+            }else{
+                addr[e.target.name] = true
+            }
+                break;
+            case 'country':if(!nameregex.test(e.target.value)){
+                addr[e.target.name] = false
+            }else{
+                addr[e.target.name] = true
+            }
+                break;
+        }
+
+
         this.setState({
             address: { ...this.state.address, currentAddress: addr },
-            user: { ...this.state.user, Address: { ...this.state.address, currentAddress: addr } }
+            user: { ...this.state.user, Address: { ...this.state.address, currentAddress: addr } },
+            validation : {
+                ...this.state.validation,
+                currentAddress : addr
+            }
 
         }, console.log('---', this.state.address, ">>>>>>>>", this.state.user))
     }
@@ -761,9 +897,42 @@ class Mortgage extends React.Component {
 
         let addr = { ...this.state.address.permanentAddress };
         addr[e.target.name] = e.target.value;
+
+        let nameregex = /^[a-zA-Z ]{1,30}$/
+        switch(e.target.name){
+            case 'ptlandmark':if(!nameregex.test(e.target.value)){
+                addr[e.target.name] = false
+            }else{
+                addr[e.target.name] = true
+            }
+                break;
+            case 'ptcity':if(!nameregex.test(e.target.value)){
+                addr[e.target.name] = false
+            }else{
+                addr[e.target.name] = true
+            }
+                break;
+            case 'ptstate':if(!nameregex.test(e.target.value)){
+                addr[e.target.name] = false
+            }else{
+                addr[e.target.name] = true
+            }
+                break;
+            case 'ptcountry':if(!nameregex.test(e.target.value)){
+                addr[e.target.name] = false
+            }else{
+                addr[e.target.name] = true
+            }
+                break;
+        }
+
         this.setState({
             address: { ...this.state.address, permanentAddress: addr },
-            user: { ...this.state.user, Address: { ...this.state.address, permanentAddress: addr } }
+            user: { ...this.state.user, Address: { ...this.state.address, permanentAddress: addr } },
+            validation : {
+                ...this.state.validation,
+                permanentAddress : addr
+            }
 
         }, console.log('---', this.state.address, ">>>>>>>>", this.state.user))
 
@@ -771,8 +940,19 @@ class Mortgage extends React.Component {
 
     }
     handleIncome = (e) => {
+        let numberonlyreg = /^[0-9]{1,20}$/
+        let income
+        if(!numberonlyreg.test(e.target.value)){
+            income = false
+        }else{
+            income = true
+        }
         this.setState({
-            annualIncome: e.target.value
+            annualIncome: e.target.value,
+            validation : {
+                ...this.state.validation,
+                annualIncome : income
+            }
         })
         console.log("annual", this.state.annualIncome)
     }
@@ -790,8 +970,34 @@ class Mortgage extends React.Component {
         let liability = { ...this.state.liability };
         console.log(liability, "///////////jjjjjj")
         liability[e.target.name] = e.target.value;
+        let nameregex = /^[a-zA-Z ]{1,30}$/
+        let numberonlyreg = /^[0-9]{1,20}$/
+        switch(e.target.name) {
+            case 'bankName':if(!nameregex.test(e.target.value)){
+                liability[e.target.name] = false
+            }else{
+                liability[e.target.name] = true
+            }
+                break; 
+            case 'AssetValue':if(!numberonlyreg.test(e.target.value)){
+                liability[e.target.name] = false
+            }else{
+                liability[e.target.name] = true
+            }
+                break; 
+            case 'AssetTenure':if(!numberonlyreg.test(e.target.value)){
+                liability[e.target.name] = false
+            }else{
+                liability[e.target.name] = true
+            }
+                break; 
+        }
         this.setState({
             liability: liability,
+            validation : {
+                ...this.state.validation,
+                liability
+            }
             //  user: { ...this.state.user, ...this.state.liability}
         })
 
@@ -837,8 +1043,27 @@ class Mortgage extends React.Component {
 
         let expLoan = this.state.expLoan
         expLoan[e.target.name] = e.target.value;
+        let numberonlyreg = /^[0-9]{1,20}$/
+        switch(e.target.name) {
+            case 'principle':if(!numberonlyreg.test(e.target.value)){
+                expLoan[e.target.name] = false
+            }else{
+                expLoan[e.target.name] = true
+            }
+                break; 
+            case 'tenure':if(!numberonlyreg.test(e.target.value)){
+                expLoan[e.target.name] = false
+            }else{
+                expLoan[e.target.name] = true
+            }
+                break; 
+        }
         this.setState({
-            expLoan: expLoan
+            expLoan: expLoan,
+            validation : {
+                ...this.state.validation,
+                expLoan
+            }
         })
         console.log(",.,.,.,.,.,.,.", this.state.expLoan)
     }
@@ -1085,6 +1310,7 @@ class Mortgage extends React.Component {
                                 LandMark:
                             </div >
                             <div className="ui input"><input type="text" name='ptlandmark'
+                            style={{ borderColor: this.state.validation.permanentAddress!=undefined?this.state.validation.permanentAddress.ptlandmark!=undefined?this.state.validation.permanentAddress.ptlandmark === false ? 'red' : '' :'':''}}
                                 onChange={(e) => this.handlePtAddress(e)}
                                 defaultValue={(this.state.user.address && this.state.user.address.permanentAddress) ? this.state.user.address.permanentAddress.ptlandmark : ''}
                                 placeholder="LandMark" /></div>
@@ -1099,6 +1325,7 @@ class Mortgage extends React.Component {
                                 City:
                             </div >
                             <div className="ui input"><input type="text" name="ptcity"
+                            style={{ borderColor: this.state.validation.permanentAddress!=undefined?this.state.validation.permanentAddress.ptcity!=undefined?this.state.validation.permanentAddress.ptcity === false ? 'red' : '' :'':''}}
                                 onChange={(e) => this.handlePtAddress(e)}
                                 // defaultValue={(this.state.user.address && this.state.user.address.permanentAddress) ? this.state.user.address.permanentAddress.ptcity : ''}
                                 placeholder="City" /></div>
@@ -1108,6 +1335,7 @@ class Mortgage extends React.Component {
                                 State:
                             </div >
                             <div className="ui input"><input type="text"
+                            style={{ borderColor: this.state.validation.permanentAddress!=undefined?this.state.validation.permanentAddress.ptstate!=undefined?this.state.validation.permanentAddress.ptstate === false ? 'red' : '' :'':''}}
                                 onChange={(e) => this.handlePtAddress(e)}
                                 name="ptstate"
                                 defaultValue={(this.state.user.address && this.state.user.address.permanentAddress) ? this.state.user.address.permanentAddress.ptstate : ''}
@@ -1118,6 +1346,7 @@ class Mortgage extends React.Component {
                                 Country:
                             </div >
                             <div className="ui input"><input type="text"
+                            style={{ borderColor: this.state.validation.permanentAddress!=undefined?this.state.validation.permanentAddress.ptcountry!=undefined?this.state.validation.permanentAddress.ptcountry === false ? 'red' : '' :'':''}}
                                 onChange={(e) => this.handlePtAddress(e)}
                                 name="ptcountry"
                                 defaultValue={(this.state.user.address && this.state.user.address.permanentAddress) ? this.state.user.address.permanentAddress.ptcountry : ''}
@@ -1189,7 +1418,8 @@ class Mortgage extends React.Component {
                         Remaining
                         Value{this.state.ifLiability && <sup style={{ color: 'red' }}>*</sup>}:
                             </div >
-                    <div className="ui input" ><input type="text" style={{ height: '38px' }}
+                    <div className="ui input" ><input type="text" style={{ height: '38px',borderColor: this.state.validation.liability!=undefined?this.state.validation.liability.AssetValue!=undefined?this.state.validation.liability.AssetValue === false ? 'red' : '' :'' :'' }}
+                    
                         ref={el => this.inputTitle = el}
                         name="AssetValue"
                         onChange={(e) => this.handleOnLiability(e)}
@@ -1202,7 +1432,7 @@ class Mortgage extends React.Component {
                         Tenure{this.state.ifLiability && <sup style={{ color: 'red' }}>*</sup>}:
                         (months)
                             </div >
-                    <div className="ui input" ><input type="text" style={{ height: '38px' }}
+                    <div className="ui input" ><input type="text" style={{ height: '38px',borderColor: this.state.validation.liability!=undefined?this.state.validation.liability.AssetTenure!=undefined?this.state.validation.liability.AssetTenure === false ? 'red' : '' :'' :''}}
                         name="AssetTenure"
                         ref={el => this.inputTenure = el}
                         onChange={(e) => this.handleOnLiability(e)}
@@ -1255,7 +1485,7 @@ class Mortgage extends React.Component {
                                                 FirstName <sup style={{ color: 'red' }}>*</sup>:
                                             </div >
                                             <div className="ui input"><input type="text"
-                                                style={{ borderColor: this.state.errorBorder ? this.state.errorBorder : '' }}
+                                                style={{ borderColor: this.state.validation.fname!=undefined?this.state.validation.fname === false ? 'red' : '' :''}}
                                                 name="fname" onChange={(e) => this.handleOnChange(e)}
                                                 placeholder="firstName"
                                                 defaultValue={this.state.user.fname && this.state.user.fname} required 
@@ -1267,7 +1497,7 @@ class Mortgage extends React.Component {
                                             <div className="name-wd">
                                                 LastName<sup style={{ color: 'red' }}>*</sup>:
                                             </div >
-                                            <div className="ui input"><input type="text" style={{ borderColor: this.state.errorBorder ? this.state.errorBorder : '' }}
+                                            <div className="ui input"><input type="text" style={{ borderColor: this.state.validation.lname!=undefined?this.state.validation.lname === false ? 'red' : '':'' }}
                                                 name="lname" onChange={(e) => this.handleOnChange(e)}
                                                 defaultValue={this.state.user.lname && this.state.user.lname}
                                                 placeholder="lastName" required disabled={this.state.status === "Approved"?true:false}/>
@@ -1280,7 +1510,7 @@ class Mortgage extends React.Component {
                                                 FatherName<sup style={{ color: 'red' }}>*</sup>:
                                             </div >
                                             <div className="ui input"><input type="text"
-                                                style={{ borderColor: this.state.errorBorder ? this.state.errorBorder : '' }}
+                                                style={{ borderColor: this.state.validation.faName!=undefined?this.state.validation.faName === false ? 'red' : '' :''}}
                                                 name="faName" onChange={(e) => this.handleOnChange(e)}
                                                 defaultValue={this.state.user.faName && this.state.user.faName}
                                                 placeholder="Father Name" required disabled={this.state.status === "Approved"?true:false}/>
@@ -1306,6 +1536,7 @@ class Mortgage extends React.Component {
                                                 MobileNo<sup style={{ color: 'red' }}>*</sup>:
                                             </div >
                                             <div className="ui input"><input type="number"
+                                                 style={{ borderColor: this.state.validation.mobileNo!=undefined?this.state.validation.mobileNo === false ? 'red' : '' :''}}
                                                 name="mobileNo" onChange={(e) => this.handleOnChange(e)}
                                                 defaultValue={this.state.user.mobileNo} placeholder=" MobileNo"
                                                 required disabled={this.state.status === "Approved"?true:false}
@@ -1316,6 +1547,7 @@ class Mortgage extends React.Component {
                                                 Email<sup style={{ color: 'red' }}>*</sup>:
                                             </div >
                                             <div className="ui input"><input type="text"
+                                             style={{ borderColor: this.state.validation.emailId!=undefined?this.state.validation.emailId === false ? 'red' : '' :''}}
                                                 name="emailId" onChange={(e) => this.handleOnChange(e)} defaultValue={this.state.user.emailId} placeholder=" email"
                                                 required disabled={this.state.status === "Approved"?true:false}
                                                 /></div>
@@ -1346,6 +1578,7 @@ class Mortgage extends React.Component {
                                                 PanNo<sup style={{ color: 'red' }}>*</sup>:
                                             </div >
                                             <div className="ui input"><input type="text"
+                                             style={{ borderColor: this.state.validation.panNo!=undefined?this.state.validation.panNo === false ? 'red' : '' :''}}
                                                 name="panNo" onChange={(e) => this.handleOnChange(e)} placeholder=" PanNo:"
                                                 defaultValue={this.state.user.panNo}
                                                 required disabled={this.state.status === "Approved"?true:false}
@@ -1356,6 +1589,7 @@ class Mortgage extends React.Component {
                                                 AadharNo<sup style={{ color: 'red' }}>*</sup>:
                                             </div >
                                             <div className="ui input"><input type="text"
+                                             style={{ borderColor: this.state.validation.AadharNo!=undefined?this.state.validation.AadharNo === false ? 'red' : '' :''}}
                                                 name="AadharNo" onChange={(e) => this.handleOnChange(e)} placeholder=" AadharNo"
                                                 defaultValue={this.state.user.AadharNo}
                                                 required disabled={this.state.status === "Approved"?true:false}
@@ -1384,8 +1618,9 @@ class Mortgage extends React.Component {
                                         <div className="name-space" style={{ marginLeft: '40px' }}>
                                             <div className="name-wd">
                                                 Company:
-                                            </div >
+                                            </div>
                                             <div className="ui input" ><input type="text"
+                                             style={{ borderColor: this.state.validation.company!=undefined?this.state.validation.company === false ? 'red' : '' :''}}
                                                 name="company" onChange={(e) => this.handleOnChange(e)} placeholder=" company"
                                                 defaultValue={this.state.user.company}
                                                 required disabled={this.state.status === "Approved"?true:false}
@@ -1441,7 +1676,7 @@ class Mortgage extends React.Component {
                                             </div >
                                             <div className="ui input"><input type="text" name='landmark'
                                                 defaultValue={(this.state.user.address && this.state.user.address.currentAddress) ? this.state.user.address.currentAddress.landmark : ''}
-
+                                                style={{ borderColor: this.state.validation.currentAddress!=undefined?this.state.validation.currentAddress.landmark!=undefined?this.state.validation.currentAddress.landmark === false ? 'red' : '' :'':''}}
                                                 onChange={(e) => this.handleCtAddress(e)}
                                                 placeholder="LandMark" disabled={this.state.status === "Approved"?true:false}/></div>
                                         </div>
@@ -1455,6 +1690,7 @@ class Mortgage extends React.Component {
                                                 City<sup style={{ color: 'red' }}>*</sup>:
                                             </div >
                                             <div className="ui input"><input type="text" name="city"
+                                                style={{ borderColor: this.state.validation.currentAddress!=undefined?this.state.validation.currentAddress.city!=undefined?this.state.validation.currentAddress.city === false ? 'red' : '' :'':''}}
                                                 onChange={(e) => this.handleCtAddress(e)}
                                                 defaultValue={(this.state.user.address && this.state.user.address.currentAddress) ? this.state.user.address.currentAddress.city : ''}
                                                 // value={this.state.user.Address.city}
@@ -1465,6 +1701,7 @@ class Mortgage extends React.Component {
                                                 State<sup style={{ color: 'red' }}>*</sup>:
                                             </div >
                                             <div className="ui input"><input type="text"
+                                                style={{ borderColor: this.state.validation.currentAddress!=undefined?this.state.validation.currentAddress.state!=undefined?this.state.validation.currentAddress.state === false ? 'red' : '' :'':''}}
                                                 onChange={(e) => this.handleCtAddress(e)}
                                                 defaultValue={(this.state.user.address && this.state.user.address.currentAddress) ? this.state.user.address.currentAddress.state : ''}
                                                 // value={this.state.user.Address.state}
@@ -1477,6 +1714,7 @@ class Mortgage extends React.Component {
                                             </div >
                                             <div className="ui input"><input type="text"
                                                 name="country"
+                                                style={{ borderColor: this.state.validation.currentAddress!=undefined?this.state.validation.currentAddress.country!=undefined?this.state.validation.currentAddress.country === false ? 'red' : '' :'':''}}
                                                 onChange={(e) => this.handleCtAddress(e)}
                                                 defaultValue={(this.state.user.address && this.state.user.address.currentAddress) ? this.state.user.address.currentAddress.country : ''}
                                                 placeholder=" Country" disabled={this.state.status === "Approved"?true:false}/></div>
@@ -1512,7 +1750,9 @@ class Mortgage extends React.Component {
                                             <div className="name-wd">
                                                 Income<sup style={{ color: 'red' }}>*</sup>:
                                          </div >
-                                            <div className="ui input"><input type="text" placeholder="Annual Income"
+                                            <div className="ui input"><input type="text" 
+                                            style={{ borderColor: this.state.validation.annualIncome!=undefined?this.state.validation.annualIncome === false ? 'red' : '' :''}}
+                                            placeholder="Annual Income"
                                                 defaultValue={this.state.annualIncome}
                                                 onChange={(e) => this.handleIncome(e)} disabled={this.state.status === "Approved"?true:false}/></div>
                                         </div>
@@ -1532,6 +1772,7 @@ class Mortgage extends React.Component {
                                                         BankName{this.state.ifLiability && <sup style={{ color: 'red' }}>*</sup>}:
                                          </div >
                                                     <div className="ui input"><input type="text" name="bankName"
+                                                    style={{ borderColor: this.state.validation.liability!=undefined?this.state.validation.liability.bankName!=undefined?this.state.validation.liability.bankName === false ? 'red' : '' :'' :'' }}
                                                         onChange={(e) => this.handleOnLiability(e)}
                                                         ref={el => this.inputBank = el}
                                                         defaultValue={this.state.liability.bankName}
@@ -1587,6 +1828,7 @@ class Mortgage extends React.Component {
                                                     AssetValue<sup style={{ color: 'red' }}>*</sup>:
                                                 </div >
                                                 <div className="ui input"><input type="text"
+                                                style={{ borderColor: this.state.validation.assetValue!=undefined?this.state.validation.assetValue === false ? 'red' : '' :''}}
                                                     ref={el => this.propValue = el}
                                                     name="AssetValue" onChange={(e) => this.handleAssetVAlue(e)}
                                                     defaultValue={value}
@@ -1626,7 +1868,9 @@ class Mortgage extends React.Component {
                                             <div className="name-wd" >
                                                 Principal<sup style={{ color: 'red' }}>*</sup>:
                                             </div >
-                                            <div className="ui input"><input type="text" placeholder="principal"
+                                            <div className="ui input"><input type="text" 
+                                            placeholder="principal"
+                                            style={{ borderColor: this.state.validation.expLoan!=undefined?this.state.validation.expLoan.principle!=undefined?this.state.validation.expLoan.principle === false ? 'red' : '' :'':''}}
                                                 name="principle"
                                                 defaultValue={this.state.expLoan.principle}
                                                 onChange={(e) => { this.handleLoan(e) } }
@@ -1640,6 +1884,7 @@ class Mortgage extends React.Component {
                                                 (months)
                                             </div >
                                             <div className="ui input"><input type="text"
+                                            style={{ borderColor: this.state.validation.expLoan!=undefined?this.state.validation.expLoan.tenure!=undefined?this.state.validation.expLoan.tenure === false ? 'red' : '' :'':''}}
                                                 name="tenure"
                                                 defaultValue={this.state.expLoan.tenure}
                                                 onChange={(e) => { this.handleLoan(e) } }
@@ -1653,7 +1898,10 @@ class Mortgage extends React.Component {
                                             <div className="ui input"><input type="number" step="0.5" placeholder="Interest"
                                                 name="intrest"
                                                 defaultValue={this.state.expLoan.intrest}
-                                                onChange={(e) => { this.handleLoan(e) } } disabled={this.state.status === "Approved"?true:false}/></div>
+                                                onChange={(e) => { this.handleLoan(e) } } 
+                                                disabled={true}
+                                                // disabled={this.state.status === "Approved"?true:false}
+                                                /></div>
                                         </div>
 
 
