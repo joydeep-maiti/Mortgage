@@ -18,7 +18,7 @@ const prod = {
     // url: "https://mortgagejsonserver.herokuapp.com"
 };
 
-const Data = dev;
+const Data = prod;
 // const Data = process.env.REACT_APP_STAGE === 'production'
 //     ? prod
 //     : dev;

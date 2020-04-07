@@ -17,7 +17,7 @@ class Mortgage extends React.Component {
             ifLiability: false,
             enableBtn: false,
             tabOpen: false,
-            radio: '',
+            radio: 'flexible',
             finIndex: 0,
             tab: false,
             activeIndex: 0,
@@ -394,6 +394,7 @@ class Mortgage extends React.Component {
                             update: false,
                             tab: true,
                             address: address,
+                            radio : res.data.expLoans.radio,
                             activeAllIndex : true
                         }, () => {
                             console.log(this.state, "all dattaaaaa")
@@ -584,7 +585,7 @@ class Mortgage extends React.Component {
             case ('GOLD'):
                 interestRate = this.state.propertyRate.gold;
                 break;
-            case ('PROPERTY AGAINST'):
+            case ('PROPERTY'):
                 interestRate = this.state.propertyRate.propertyAgainst;
                 break;
             case ('OTHERS'):
@@ -829,7 +830,6 @@ class Mortgage extends React.Component {
 
     handleRadio = (e, { value }) => {
         this.setState({
-            value,
             radio: value
         })
     }
@@ -1944,17 +1944,19 @@ class Mortgage extends React.Component {
                                                 label='Flexible'
                                                 name='flexible'
                                                 value='flexible'
-                                                checked={this.state.value === 'flexible'}
+                                                checked={this.state.radio === 'flexible'}
                                                 onChange={this.handleRadio}
                                                 className='radio-space name-wd '
+                                                disabled={this.state.status === "Approved"?true:false}
                                                 />
                                             <Radio
                                                 label='Fixed'
                                                 name='fixed'
                                                 value='fixed'
-                                                checked={this.state.value === 'fixed'}
+                                                checked={this.state.radio === 'fixed'}
                                                 onChange={this.handleRadio}
                                                 className='radio-space name-wd '
+                                                disabled={this.state.status === "Approved"?true:false}
                                                 />
                                         </div>
                                     </Col>
@@ -1968,9 +1970,9 @@ class Mortgage extends React.Component {
                             {this.state.update && (
                                 <Button className="ml-auto" style={{ backgroundColor: 'green', borderColor: 'green', marginRight: '-70%' }} onClick={() => this.handleProceed()}>Save</Button>)}
                             {!this.state.update && (
-                                <Button className="ml-auto" style={{ backgroundColor: 'green', borderColor: 'green', marginRight: '-69%' }} onClick={() => this.handleProceed(this.state.reqId)}>Update</Button>)}
+                                <Button className="ml-auto" style={{ backgroundColor: 'green', borderColor: 'green', marginRight: '250px' }} onClick={() => this.handleProceed(this.state.reqId)}>Update</Button>)}
 
-                            <Button className="ml-auto" style={{ backgroundColor: 'green', borderColor: 'green', marginRight: '250px' }} onClick={() => this.handleProceed()} disabled={!this.state.enableBtn}>Proceed</Button>
+                            {this.state.activeAllIndex == false && (<Button className="ml-auto" style={{ backgroundColor: 'green', borderColor: 'green', marginRight: '250px' }} onClick={() => this.handleProceed()} disabled={!this.state.enableBtn}>Proceed</Button>)}
                         </Row>
                     </form>
                 </Paper>
