@@ -8,7 +8,7 @@ import './style.css';
 import { Data } from '../../config'
 import download from 'downloadjs';
 
-
+let storageRef = null
 
 class Mortgage extends React.Component {
     constructor(props) {
@@ -52,6 +52,7 @@ class Mortgage extends React.Component {
     }
 
     componentWillMount = () => {
+        storageRef = this.props.storageRef
         console.log("------------Mortgage Props", this.props);
         
         axios.get(`${Data.url}/property/1`)
@@ -238,11 +239,28 @@ class Mortgage extends React.Component {
             }
         }
     }
-    async download(reqId, fileName) {
+    async download(path, file) {
         // debugger
-        const res = await fetch(`${Data.url}/download?reqid=${reqId}&fileName=${fileName}`);
-        const blob = await res.blob();
-        download(blob, fileName);
+        storageRef.child(path+"/"+file.lastModified+file.name).getDownloadURL().then(function(url) {
+            // `url` is the download URL for 'images/stars.jpg'
+          
+            // This can be downloaded directly:
+            // console.log("data recieved", url);
+            var xhr = new XMLHttpRequest();
+            xhr.responseType = 'blob';
+            xhr.open('GET', url);
+            xhr.send();
+            xhr.onload = function(event) {
+                var blob = xhr.response;
+                // console.log("BLOB", blob)
+                download(blob, file.name);
+            };
+          }).catch(function(error) {
+                alert("Oops! Something went wrong");
+          });
+        // const res = await fetch(`${Data.url}/download?reqid=${reqId}&fileName=${fileName}`);
+        // const blob = await res.blob();
+        // download(blob, fileName);
 
     }
 
@@ -1086,6 +1104,18 @@ class Mortgage extends React.Component {
         // data.append('file', e.target.files[0])
         // console.log(data, "......uplaod datass")
         let file1 = e.target.files[0];
+        console.log("---File data", file1)
+        if(file1.type !== "image/jpeg" && file1.type !== "image/png" && file1.type !== "application/pdf" ){
+            alert("Unsupported file format. Please choose a correct file format.")
+            return;
+        }
+        // name: "IMG_20180712_202710(1).jpg"
+        // lastModified: 1533541984000
+        // lastModifiedDate: Mon Aug 06 2018 13:23:04 GMT+0530 (India Standard Time) {}
+        // webkitRelativePath: ""
+        // size: 269929
+        // type: "image/jpeg"
+        // type: "application/pdf"
 
         // let body = {
         //     data
@@ -1105,35 +1135,63 @@ class Mortgage extends React.Component {
         //         console.log(e)
         //         window.alert("data not send")
         //     })
-        this.setState({
-            // upload: { ...this.state.upload, file1: file1 },
-            property: { ...property, file1: file1 }
-        }, () => console.log(this.state.property, "oppppppppp"))
+        let filename = file1.lastModified + file1.name
+        var docref = storageRef.child('mortgage/'+filename);
+        const self = this;
+        docref.put(file1)
+        .then(function(snapshot) {
+            console.log('Uploaded a blob or file!');
+            self.setState({
+                property: { ...property, file1: file1 }
+            })
+        });
+
+        
         // return res;
     }
     handleDoc1 = (e) => {
         let property = { ...this.state.property }
-        let file2 = e.target.files[0]
+        let file1 = e.target.files[0]
+        if(file1.type !== "image/jpeg" && file1.type !== "image/png" && file1.type !== "application/pdf" ){
+            alert("Unsupported file format. Please choose a correct file format.")
+            return;
+        }
+        let filename = file1.lastModified + file1.name
+        var docref = storageRef.child('aadhar/'+filename);
+        const self = this;
+        docref.put(file1)
+        .then(function(snapshot) {
+            console.log('Uploaded a blob or file!');
+            self.setState({
+                property: { ...property, file2: file1 }
+            })
+        });
         // file2["name"] = e.target.files[0].name;
         // file2["size"] = e.target.files[0].size;
         // file2["type"] = e.target.files[0].type;
-        this.setState({
-            // upload: { ...this.state.upload, file2: file2 },
-            property: { ...property, file2: file2 }
-
-        })
+        
     }
     handleDoc2 = (e) => {
         let property = { ...this.state.property }
-        let file3 = e.target.files[0]
+        let file1 = e.target.files[0]
+        if(file1.type !== "image/jpeg" && file1.type !== "image/png" && file1.type !== "application/pdf" ){
+            alert("Unsupported file format. Please choose a correct file format.")
+            return;
+        }
+        let filename = file1.lastModified + file1.name
+        var docref = storageRef.child('pan/'+filename);
+        const self = this;
+        docref.put(file1)
+        .then(function(snapshot) {
+            console.log('Uploaded a blob or file!');
+            self.setState({
+                property: { ...property, file3: file1 }
+            })
+        });
         // file3["name"] = e.target.files[0].name;
         // file3["size"] = e.target.files[0].size;
         // file3["type"] = e.target.files[0].type;
-        this.setState({
-            // upload: { ...this.state.upload, file3: file3 },
-            property: { ...property, file3: file3 }
-
-        })
+        
     }
 
     render() {
@@ -1386,11 +1444,11 @@ class Mortgage extends React.Component {
                                 <Table.Cell>{property.propertyType}</Table.Cell>
                                 <Table.Cell> {property.assestValue}</Table.Cell>
                                 <Table.Cell disabled={this.state.status === "Approved"?true:false}>
-                                    <div >MorgagedDoc : <a href="javascript:;" onClick={() => this.download(this.state.reqId, (property.file1 ? property.file1.name : ''))}>{property.file1 ? property.file1.name : ' '} </a>
+                                    <div >MorgagedDoc : <a href="javascript:;" onClick={() => this.download("mortgage", (property.file1 ? property.file1: ''))}>{property.file1 ? property.file1.name : ' '} </a>
                                         {property.file1 && <Icon size="small" inverted name='delete' className="searchIcon" color='black' link onClick={() => this.deleteFile(i, { file1: undefined })} />}</div>
-                                    <div >AadhaarCard : <a href="javascript:;" onClick={() => this.download(this.state.reqId, (property.file2 ? property.file2.name : ''))}>{property.file2 ? property.file2.name : ' '}</a>
+                                    <div >AadhaarCard : <a href="javascript:;" onClick={() => this.download("aadhar", (property.file2 ? property.file2 : ''))}>{property.file2 ? property.file2.name : ' '}</a>
                                         {property.file2 && <Icon size="small" inverted name='delete' className="searchIcon" color='black' link onClick={() => this.deleteFile(i, { file2: undefined })} />}</div>
-                                    <div>PanCard : <a href="javascript:;" onClick={() => this.download(this.state.reqId, (property.file3 ? property.file3.name : ''))}>{property.file3 ? property.file3.name : ' '}
+                                    <div>PanCard : <a href="javascript:;" onClick={() => this.download("pan", (property.file3 ? property.file3 : ''))}>{property.file3 ? property.file3.name : ' '}
                                     </a>
                                         {property.file3 && <Icon size="small" inverted name='delete' className="searchIcon" color='black' link onClick={() => this.deleteFile(i, { file3: undefined })} />}</div></Table.Cell>
                             </Table.Row>

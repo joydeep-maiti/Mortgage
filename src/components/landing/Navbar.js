@@ -683,7 +683,7 @@ export default class MyNavbar extends React.Component {
                                         Request No. <sup style={{ color: 'red' }}>*</sup>&nbsp;&nbsp;:
                                     </div >
                                     <div className="ui input" style={{width:"200px"}}>
-                                        <input type="text" name="reqno" placeholder="Request No." required onChange={(e,data) => this.handleOnChange(e,data,"req" )} value={this.state.reportReq.reqId} required/>
+                                        <input type="number" name="reqno" placeholder="Request No." required onChange={(e,data) => this.handleOnChange(e,data,"req" )} value={this.state.reportReq.reqId} required/>
                                     </div>
                                 </div>
                             </Col>
@@ -692,7 +692,7 @@ export default class MyNavbar extends React.Component {
                             <Col className="same-row">
                                 <div className="reportCol">
                                     <div className="name-wd2" style={{textAlign:"right", marginRight:10}}>
-                                    Report Filter<sup style={{ color: 'red' }}>*</sup>:
+                                    Report Type<sup style={{ color: 'red' }}>*</sup>:
                                     </div>
                                     <div className="ui input" style={{width:"200px"}}>
                                         <Dropdown placeholder='Report Type' search selection options={stateOptions} onChange={(e,data) => this.handleOnChange(e,data,"type")} defaultValue={this.state.reportReq.type} required/>

@@ -14,7 +14,15 @@ import Config from './components/Config/Config'
 import SignIn from './components/Login/SignIn'
 import UserManagament from './components/UserManagament/UserManagament'
 import axios from 'axios'
-import { Data } from './config'
+import { Data, firebaseConfig } from './config'
+import * as firebase from "firebase/app";
+import 'firebase/storage';
+
+
+
+firebase.initializeApp(firebaseConfig);
+const storage = firebase.storage();
+const storageRef = storage.ref();
 
 class App extends React.Component {
   state = {
@@ -93,9 +101,9 @@ class App extends React.Component {
       routes = (
           <div>
             <Route exact path='/' render={() => <MyNavbar handleLogout={this.handleLogout}> <Landing /></MyNavbar>} />
-            <Route path='/mortgage' render={() => <MyNavbar handleLogout={this.handleLogout}> <Mortgage /></MyNavbar>} />
+            <Route path='/mortgage' render={() => <MyNavbar handleLogout={this.handleLogout}> <Mortgage storageRef={storageRef}/></MyNavbar>} />
             <Route exact path='/Preview' render={() => <MyNavbar handleLogout={this.handleLogout}> <Preview /></MyNavbar>} />
-            <Route exact path='/paymentLoan' render={() => <MyNavbar handleLogout={this.handleLogout}> <PaymentLoan /></MyNavbar>} />
+            <Route exact path='/paymentLoan' render={() => <MyNavbar handleLogout={this.handleLogout}> <PaymentLoan storageRef={storageRef}/></MyNavbar>} />
             <Route exact path='/paymentScheduler' render={() => <MyNavbar handleLogout={this.handleLogout}> <PaymentScheduler /></MyNavbar>} />
             <Route exact path='/config' render={() => <MyNavbar handleLogout={this.handleLogout}> <Config /></MyNavbar>} />
             <Route exact path='/usermanagement' render={() => <MyNavbar handleLogout={this.handleLogout}> <UserManagament /></MyNavbar>} />

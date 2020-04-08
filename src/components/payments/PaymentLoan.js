@@ -5,6 +5,9 @@ import { Icon, Dropdown, Table, Modal, Button } from 'semantic-ui-react'
 import {Form, FormControl} from 'react-bootstrap'
 import { Data } from '../../config'
 import download from 'downloadjs';
+
+let storageRef = null
+
 class PaymentLoan extends React.Component {
   constructor() {
     super();
@@ -21,6 +24,7 @@ class PaymentLoan extends React.Component {
   componentWillMount() {
     // debugger
     // console.log(this.state.reqId, "khjkhj.kdjhskdhcskhcskdhjkk")
+    storageRef = this.props.storageRef
     axios.get(`${Data.url}/users/`, )
       .then(res => {
         console.log("------------------Applications",res.data)
@@ -152,11 +156,28 @@ class PaymentLoan extends React.Component {
     this.props.history.push('/mortgage?id='+id);
   }
 
-  async download(reqId, fileName) {
-    debugger
-    const res = await fetch(`${Data.url}/download?reqid=${reqId}&fileName=${fileName}`);
-    const blob = await res.blob();
-    download(blob, fileName);
+  async download(path, file) {
+    // debugger
+    // const res = await fetch(`${Data.url}/download?reqid=${reqId}&fileName=${fileName}`);
+    // const blob = await res.blob();
+    // download(blob, fileName);
+    storageRef.child(path+"/"+file.lastModified+file.name).getDownloadURL().then(function(url) {
+      // `url` is the download URL for 'images/stars.jpg'
+    
+      // This can be downloaded directly:
+      // console.log("data recieved", url);
+      var xhr = new XMLHttpRequest();
+      xhr.responseType = 'blob';
+      xhr.open('GET', url);
+      xhr.send();
+      xhr.onload = function(event) {
+          var blob = xhr.response;
+          // console.log("BLOB", blob)
+          download(blob, file.name);
+      };
+    }).catch(function(error) {
+          alert("Oops! Something went wrong");
+    });
 
   }
 
@@ -276,18 +297,18 @@ class PaymentLoan extends React.Component {
                 <Table.Cell>
                   {
                     user.totalProperty.map((total, key) => {
-                      return (<div>
+                      return (<p>
                         <p key={key}>
-                          <a href="javascript:;" onClick={() => this.download(user.id, (total.file1 ? total.file1.name : ''))}>{total.file1 ? total.file1.name : ''}</a> ,
+                          <a href="javascript:;" onClick={() => this.download("mortgage", (total.file1 ? total.file1 : ''))}>{total.file1 ? total.file1.name : ''}</a> ,
 
                       </p>
                         <p>
-                          <a href="javascript:;" onClick={() => this.download(user.id, (total.file2 ? total.file2.name : ''))}>{total.file2 ? total.file2.name : ''}</a>,
+                          <a href="javascript:;" onClick={() => this.download("aadhar", (total.file2 ? total.file2 : ''))}>{total.file2 ? total.file2.name : ''}</a>,
                       </p>
                         <p>
-                          <a href="javascript:;" onClick={() => this.download(user.id, (total.file3 ? total.file3.name : ''))}>{total.file3 ? total.file3.name : ''}</a>
+                          <a href="javascript:;" onClick={() => this.download("pan", (total.file3 ? total.file3 : ''))}>{total.file3 ? total.file3.name : ''}</a>
                         </p>
-                      </div>
+                      </p>
                       )
                     })
                   }
