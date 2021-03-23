@@ -14,7 +14,8 @@ const dev = {
 };
 
 const prod = {
-    url: "https://json-server-mortgage.herokuapp.com"
+    //url: "https://json-server-mortgage.herokuapp.com"
+    url:"https://mortgagejsonserver.herokuapp.com"
     // url: "https://mortgagejsonserver.herokuapp.com"
 };
 
